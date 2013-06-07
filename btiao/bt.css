@@ -1,0 +1,163 @@
+body {
+	font-size:14px;
+	margin:0;
+	padding:0;
+}
+#idNavigator {
+	height:80px;
+	position:fixed;
+	z-index:998;
+	width:1264px;
+	top:0px;
+	left:0px;
+	background-color:#f8f7f8;
+	margin: 
+}
+
+#idNavgLeft {
+	margin:10px 0px 0px 132px;
+	float:left;
+}
+#idNavgRight {
+	margin:10px 132px 0px 0px;
+	float:right;
+}
+#idLogo {
+	float:left;
+	border-style:solid;
+	border-width:5px;
+	border-color:transparent;
+	height:60px;
+	z-index:999;
+	display:inline-block;
+}
+.cNavg{
+	font:28px bold;
+	float:left;
+	border-style:solid;
+	border-width:20px 0px 10px 10px;
+	border-color:transparent;
+	margin:0;
+	display:inline-block;
+}
+.cCur {
+	font-size:16px;
+	border-width:34px 0px 10px 10px;
+}
+
+#idContainer {
+	margin:80px 132px 0px 132px;
+	padding:0px 0px 0px 0px;
+}
+#idFootor {
+	width:1000px;
+	height:50px;
+	background-color:red;
+	float:left;
+	margin:0px 132px 0px 132px;
+	padding:0px 0px 0px 0px;
+}
+
+#idSelectMode {
+	width:710px;
+	background-color:blue;
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+	float:left;
+}
+.cSelMode {
+	border-style:solid;
+	border-width:5px;
+	border-color:#efefef;
+	font-size:24px;
+	background-color:green;
+}
+.cSelModeLast {
+	border-width:20px 10px 10px 10px;
+}
+
+#idAdv,#idLastLook {
+	/*display:none;*/
+	width:264px;
+	height:500px;
+	background-color:#f8f8f8;
+	float:right;
+	margin:10px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+}
+#idLastLook {
+	margin:0px 0px 0px 0px;
+}
+
+#idAllTg {
+	/*display:none;*/
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+	float:left;
+}
+#idTgList {
+	width:710px;
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+	list-style-type:none;
+}
+.cTgLi {
+	display:inline-block;
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+}
+.cTgUnit {
+	width:350px;
+	height:360px;
+	background-color:#f7f7f7;
+	margin:0px 0px 0px 0px;
+	padding:0px 0px 0px 0px;
+}
+
+.ctgImg {
+	width: 330px;
+	height:200px;
+	padding:10px 10px 5px 10px;
+}
+.ctgTitle {
+	margin:0;
+	padding: 5px 10px 5px 10px;
+	font-size: 16px;
+}
+.cPriceLine, .cPriceLine p{
+	margin:5px 10px 5px 10px;
+}
+.cPrice,.cMoneySign,.cValue,.cGo{
+	font-size:26px;
+	font-weight:bold;
+	color:#eb4800;
+	font-family: tahoma, arial, ËÎÌו;
+}
+.cMoneySign{
+	font-size:22px;
+	font-family: Arial;
+}
+.cValue{
+	text-decoration: line-through;
+	font-size:16px;
+	font-weight:normal;
+	color:#a0a0a0;
+}
+.cGo{
+	margin:0;
+	padding:0;
+	border:solid rgb(220, 50, 50);
+	position:relative;
+	left:250px;
+	top:-30px;
+	width:65px;
+	font-size:20px;
+	color:white;
+	background-color:rgb(200,50,50);
+}
+a:link,a:visited,a:hover,a:active {
+	text-decoration:none;
+	color:#000000;
+}
+
+
