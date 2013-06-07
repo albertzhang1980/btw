@@ -1,0 +1,22 @@
+package com.btiao;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Result {
+	static public int SUCCESS = 0;
+	static public int ARG_ERROR = 1;
+	static public int TG_ERROR = 2;
+	
+	static public Map<Integer,String> cn = new HashMap<Integer,String>();
+	
+	static public String desc(int rst) {
+		return cn.get(rst);
+	}
+	
+	static {
+		cn.put(SUCCESS, "");
+		cn.put(ARG_ERROR, "http参数错误");
+		cn.put(TG_ERROR, "团购模块故障");
+	}
+}
