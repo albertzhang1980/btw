@@ -116,7 +116,7 @@ public class P2PInfoMgr {
 		try {
 			cn = getCon(city, true);
 			Statement s = cn.createStatement();
-			s.execute("SET FILES LOG FALSE");
+			s.execute("SET FILES LOG FALSE"); //
 			createTB(s);
 			cn.commit();
 			s.close();
