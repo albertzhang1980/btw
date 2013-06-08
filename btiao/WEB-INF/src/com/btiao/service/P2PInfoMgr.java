@@ -27,7 +27,7 @@ public class P2PInfoMgr {
 	
 	public void closeDB(String city) throws Exception {
 		Connection cn = getCon(city, false);
-		cn.createStatement().execute("SHUTDOWN COMPACT");
+		cn.createStatement().execute("SHUTDOWN IMMEDIATELY");
 		cn.close();
 
 		initCity.put(city, false);
@@ -116,6 +116,7 @@ public class P2PInfoMgr {
 		try {
 			cn = getCon(city, true);
 			Statement s = cn.createStatement();
+			s.execute("SET FILES LOG FALSE");
 			createTB(s);
 			cn.commit();
 			s.close();

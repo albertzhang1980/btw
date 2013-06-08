@@ -64,7 +64,7 @@ var p1 = {x:116.414,y:39.915};
 var p2 = judgeNm(p1, 1*1000, 1*1000);
 
 	var INTERVAL = 700;
-	var INTERVAL_NUM = 1500;
+	var INTERVAL_NUM = 2000;
 	var INTERVAL_FAILED = 5000;
 	var PER_NUM = 100;
 	
