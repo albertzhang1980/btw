@@ -27,7 +27,7 @@ function drv(p1, p2) {
 		renderOptions: { map: gMap, autoViewport: true }
 	});
 	
-	//driving.search("瑗垮崟","鐜嬪簻浜�);
+	//driving.search("西单","王府井");
 	driving.search(new BMap.Point(p1.x, p1.y), new BMap.Point(p2.x, p2.y));
 }
 function printGeo(lon, lat, title) {
@@ -50,8 +50,8 @@ var lonDist = cos40*2*3.1415926*6371.004*1000/360; //alert(lonDist);
 var latDist = 2*3.1415926*6356.755*1000/360; //alert(latDist);
 
 function judgeNm(p, dx, dy) {
-	//var lonDist = 111194.9946; //2*3.1415926*6371.004*1000/360; //缁忓害涓婃瘡搴﹀灏戠背锛�11194.9946 m
-	//var latDist = 110946.3026; //2*3.1415926*6356.755*1000/360; //璧ら亾涓婄殑0缁村害绾挎瘡缁忓害澶氬皯绫筹紝110946.3026 m	
+	//var lonDist = 111194.9946; //2*3.1415926*6371.004*1000/360; //经度上每度多少米，111194.9946 m
+	//var latDist = 110946.3026; //2*3.1415926*6356.755*1000/360; //赤道上的0维度线每经度多少米，110946.3026 m	
 	var r = {x:(p.x*1000000+1000000*dx/lonDist)/1000000, y:(p.y*1000000+1000000*dy/latDist)/1000000};
 	return r;
 }
@@ -64,7 +64,7 @@ var p1 = {x:116.414,y:39.915};
 var p2 = judgeNm(p1, 1*1000, 1*1000);
 
 	var INTERVAL = 700;
-	var INTERVAL_NUM = 1000;
+	var INTERVAL_NUM = 2500;
 	var INTERVAL_FAILED = 5000;
 	var PER_NUM = 100;
 	
@@ -112,7 +112,7 @@ function genAll(city, p, step, pp) {
 		return true;
 	}
 
-	//姣忛殧100ms鎵ц涓�锛屼竴娆℃墽琛�0鏉�
+	//每隔100ms执行一次，一次执行10条
 	setTimeout(function() {
 		var exeNum = 0;
 		
@@ -172,14 +172,14 @@ function genAll(city, p, step, pp) {
 			var sDist = ((eclipseNumDist)/spDist)%60; sDist = parseInt(sDist);
 			
 			$("#genAllProcess").empty();
-			$("#genAllProcess").append("<p>total: "+total+",宸蹭娇鐢ㄦ椂闂� "+parseInt(time/3600)+"灏忔椂,"+parseInt(time/60)%60+"鍒嗛挓,"+parseInt(time)%60+"绉�+"</p>");
-			$("#genAllProcess").append("<p>finished_gj: "+genAll.okGJNum+","+genAll.okGJBDNum+",閫熷害_gj: "+spGJ+",鍓╀綑鏃堕棿: "+hGJ+"灏忔椂,"+mGJ+"鍒嗛挓,"+sGJ+"绉�+"</p>");
-			$("#genAllProcess").append("<p>finished_zj: "+genAll.okZJNum+","+genAll.okZJBDNum+",閫熷害_zj: "+spZJ+",鍓╀綑鏃堕棿: "+hZJ+"灏忔椂,"+mZJ+"鍒嗛挓,"+sZJ+"绉�+"</p>");
-			$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",閫熷害_zj: "+spDist+",鍓╀綑鏃堕棿: "+hDist+"灏忔椂,"+mDist+"鍒嗛挓,"+sDist+"绉�+"</p>");
+			$("#genAllProcess").append("<p>total: "+total+",已使用时间: "+parseInt(time/3600)+"小时,"+parseInt(time/60)%60+"分钟,"+parseInt(time)%60+"秒"+"</p>");
+			$("#genAllProcess").append("<p>finished_gj: "+genAll.okGJNum+","+genAll.okGJBDNum+",速度_gj: "+spGJ+",剩余时间: "+hGJ+"小时,"+mGJ+"分钟,"+sGJ+"秒"+"</p>");
+			$("#genAllProcess").append("<p>finished_zj: "+genAll.okZJNum+","+genAll.okZJBDNum+",速度_zj: "+spZJ+",剩余时间: "+hZJ+"小时,"+mZJ+"分钟,"+sZJ+"秒"+"</p>");
+			$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",速度_zj: "+spDist+",剩余时间: "+hDist+"小时,"+mDist+"分钟,"+sDist+"秒"+"</p>");
 		}
 	}, 0);
 
-	//瀵逛簬瓒呮椂鐨勮姹傦紝璐熻矗閲嶆柊澶勭悊
+	//对于超时的请求，负责重新处理
 	setTimeout(function() {
 		var NUM = total;
 		
@@ -190,7 +190,7 @@ function genAll(city, p, step, pp) {
 			return;
 		}
 		
-		//1娆″鐞�0涓�
+		//1次处理10个
 		var exeNumZJ = 0;
 		if (genAll.okZJNum < NUM && genAll.failsZJ) {
 			while (genAll.failsZJ.length > 0 && exeNumZJ++ < 10) {
@@ -215,7 +215,7 @@ function genAll(city, p, step, pp) {
 			}
 		}
 		
-		//鍓╀笅鐨勫欢杩焫绉掍笅澶勭悊
+		//剩下的延迟x秒下处理
 		setTimeout(arguments.callee, INTERVAL_FAILED);
 	}, INTERVAL_FAILED);
 }
@@ -327,9 +327,9 @@ function getDistZJ(city, p1, p2, disable) {
 			if (status == BMAP_STATUS_TIMEOUT) {
 				failCB({p1:p1,p2:p2}, true, false, false);
 			} else { 
-				var totalDist = -1;//鍗曚綅锛氱背锛�1琛ㄧず鏈煡
-				var lineDist = -1;//鍗曚綅锛氱背锛�1琛ㄧず鏈煡
-				var time = -1;//鍗曚綅锛氬垎閽燂紝-1琛ㄧず鏈煡
+				var totalDist = -1;//单位：米，-1表示未知
+				var lineDist = -1;//单位：米，-1表示未知
+				var time = -1;//单位：分钟，-1表示未知
 				var P1 = cvtP(p1);
 				var P2 = cvtP(p2);
 	
@@ -337,17 +337,17 @@ function getDistZJ(city, p1, p2, disable) {
 					var plan = results.getPlan(0);
 					if (0) { for (var rtIdx=0; rtIdx<plan.getNumRoutes(); ++rtIdx) {
 						var route = plan.getRoute(0);
-						var d = route.getDistance(false); //鍗曚綅锛氱背
+						var d = route.getDistance(false); //单位：米
 						totalDist += d;
 					}
-					time = 60*totalDist/(50*1000); } //鎸夌収骞冲潎姣忓皬鏃�0鍏噷 
+					time = 60*totalDist/(50*1000); } //按照平均每小时50公里 
 					
 					totalDist = plan.getDistance(false);
 					totalDist = parseInt(totalDist);
 					time = plan.getDuration(false);
 					time = parseInt(time);	
 				} else {
-					; //鏌ヨ閿欒锛岃〃绀烘湭鐭�
+					; //查询错误，表示未知
 					$("#txtoutdetail").append("<p>zjerr="+status+",p1.x="+p1.x+",p1.y="+p1.y+",p2.x="+p2.x+",p2.y="+p2.y+"</p>");
 				}
 				
@@ -391,11 +391,11 @@ function getDistGJ(city, p1, p2, disable) {
 		if (status == BMAP_STATUS_TIMEOUT){
 			failCB({p1:p1,p2:p2}, false, true, false);
 		} else {
-			var totalDistBx = -1; //鍗曚綅锛氱背锛�1琛ㄧず鏈煡
-			var totalDistGj = -1; //鍗曚綅锛氱背锛�1琛ㄧず鏈煡
-			var totalDist = -1; //鍗曚綅锛氱背锛�1琛ㄧず鏈煡
-			var time = -1; //鍗曚綅锛氬垎閽燂紝-1琛ㄧず鏈煡
-			var lineDist = -1; //鍗曚綅锛氱背锛�1琛ㄧず鏈煡
+			var totalDistBx = -1; //单位：米，-1表示未知
+			var totalDistGj = -1; //单位：米，-1表示未知
+			var totalDist = -1; //单位：米，-1表示未知
+			var time = -1; //单位：分钟，-1表示未知
+			var lineDist = -1; //单位：米，-1表示未知
 			
 			if (status == BMAP_STATUS_SUCCESS) {
 				var firstPlan = results.getPlan(0);
@@ -411,25 +411,25 @@ function getDistGJ(city, p1, p2, disable) {
 					var line = firstPlan.getLine(i);
 					gMap.addOverlay(new BMap.Polyline(line.getPath()));
 					var d = line.getDistance(false);
-					//var num = line.getNumViaStops(); //閫斿緞绔欑偣鏁扮洰
+					//var num = line.getNumViaStops(); //途径站点数目
 					totalDistGj += d;
 				}
-				time += 60*totalDistGj/(30*1000); //鍏氦閫熷害锛�0鍏噷/灏忔椂
+				time += 60*totalDistGj/(30*1000); //公交速度：30公里/小时
 				totalDist = totalDistGj + totalDistBx; }
 				
 				//$(txtoutdetail).append("totalDistGJ=" + totalDist+"("+lineDist+"), ");
 			
 				totalDist = firstPlan.getDistance(false);
-				totalDist = parseInt(totalDist); //鍘绘帀灏忔暟浣�
+				totalDist = parseInt(totalDist); //去掉小数位
 				time = firstPlan.getDuration(false)/60;
-				time = parseInt(time); //鍘绘帀灏忔暟浣�
+				time = parseInt(time); //去掉小数位
 			} else {
-				; //鏌ヨ閿欒锛岃〃绀烘湭鐭�
+				; //查询错误，表示未知
 				$("#txtoutdetail").append("<p>gjerr="+status+",p1.x="+p1.x+",p1.y="+p1.y+",p2.x="+p2.x+",p2.y="+p2.y+"</p>");
 			}
 				
 			lineDist = gMap.getDistance(new BMap.Point(p1.x, p1.y),new BMap.Point(p2.x, p2.y));
-			lineDist = parseInt(lineDist); //鍘绘帀灏忔暟浣�
+			lineDist = parseInt(lineDist); //去掉小数位
 			
 			var P1 = cvtP(p1);
 			var P2 = cvtP(p2);
