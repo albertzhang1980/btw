@@ -86,6 +86,7 @@ public class P2PInfo2DB extends HttpServlet {
 			String[] clearInc = args.get("clearInc");
 			if (clearInc != null && clearInc.length > 0) {
 				process_num = 0;
+				t1 = System.currentTimeMillis();
 				rsp(res, true);
 				return;
 			}

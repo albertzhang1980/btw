@@ -80,9 +80,10 @@ public class P2PInfoMgr {
 	}
 	public boolean toDBDist(String city, int p1x, int p1y, int p2x, int p2y, int dist) {
 		Connection cn = null;
+		Statement s = null;
 		try {
 			cn = getCon(city, false);
-			Statement s = cn.createStatement();
+			s = cn.createStatement();
 			insertDist(s, p1x,p1y,p2x,p2y, dist);
 			cn.commit();
 			s.close();
@@ -91,6 +92,13 @@ public class P2PInfoMgr {
 			e.printStackTrace();
 			return false;
 		} finally {
+			if (s != null) {
+				try {
+					s.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 			if (cn != null) {
 				try {
 					cn.close();

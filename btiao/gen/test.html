@@ -39,16 +39,16 @@ var func = function() {
 	<button onclick="printGeo(p2.x, p2.y,'p2');">p2</button>
 	<button onclick="gMap.clearOverlays();">clearMark</button>
 	<button onclick="next_p2();">next_p2</button>
-	<button onclick="getDistGJ('beijing',p1, p2);">GJ</button>
-	<button onclick="getDistZJ('beijing',p1, p2);">ZJ</button>
-	<button onclick="getDistOnly('beijing',p1, p2);">Dist</button>
-	<button onclick="initDB('beijing');">initdb</button>
-	<button onclick="closeDB('beijing');">closedb</button>
+	<button onclick="getDistGJ(city,p1, p2);">GJ</button>
+	<button onclick="getDistZJ(city,p1, p2);">ZJ</button>
+	<button onclick="getDistOnly(city,p1, p2);">Dist</button>
+	<button onclick="initDB(city);">initdbBJ</button>
+	<button onclick="closeDB(city);">closedb</button>
 	<!--东经度：116.7，西经度：116.1，北纬度：40.25，南纬度：39.65 -->
 	<!--东经度：116.6，西经度：116.25，北纬度：40.15，南纬度：39.8 -->
-	<button onclick="genAll('beijingcore',{x:116.25,y:39.8},500, {x:116.6,y:40.15});">getallcore</button>
-	<button onclick="genAll('beijingcc',{x:116.28,y:39.8},500, {x:116.55,y:40.07});">getallcc</button>
-	<button onclick="genAll('beijing2', p1, 500, 10);">getall2</button>
+	<button onclick="city='beijingc';genAll(city,{x:116.25,y:39.8},500, {x:116.6,y:40.15});">getallcore</button>
+	<button onclick="city='beijingcc';genAll(city,{x:116.28,y:39.8},500, {x:116.55,y:40.07});">getallcc</button>
+	<button onclick="city='beijing2';genAll(city, p1, 500, 10);">getall2</button>
 	<button onclick="clearInc();">clearInc</button>
 </div>
 <div id="txtout" style="width:800px">

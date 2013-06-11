@@ -60,8 +60,10 @@ function next_p2() {
 	$("#p2x").val(p2.x);
 	$("#p2y").val(p2.y);
 }
+
 var p1 = {x:116.414,y:39.915};
 var p2 = judgeNm(p1, 1*1000, 1*1000);
+var city = "beijing";
 
 	var INTERVAL = 700;
 	var INTERVAL_NUM = 1000;
@@ -69,10 +71,15 @@ var p2 = judgeNm(p1, 1*1000, 1*1000);
 	var PER_NUM = 100;
 	
 function genAll(city, p, step, pp) {
-	initDB(city);
+	printGeo(p.x, p.y, "start");
+	printGeo(pp.x, pp.y, "end");
 	
-	var numX = (pp.x - p.x)/(step/lonDist);
-	var numY = (pp.y - p.y)/(step/latDist);
+	var numX = (pp.x - p.x)/(step/lonDist); numX = parseInt(numX) + 1;
+	var numY = (pp.y - p.y)/(step/latDist); numY = parseInt(numY) + 1;
+	
+	var pp2 = judgeNm(p, step*numX, step*numY);
+	printGeo(pp2.x, pp2.y, "end2");
+	
 	var total = numX*numY*(numX*numY-1); total = parseInt(total);
 	
 	var tm_start = new Date().getTime();
@@ -83,6 +90,15 @@ function genAll(city, p, step, pp) {
 	var iSecond=0;
 	var jSecond=0;
 	
+	genAll.okGJNum = 0;
+	genAll.okZJNum = 0;
+	genAll.okDistOnlyNum = 0;
+	genAll.okGJNumLast = 0;
+	genAll.okZJNumLast = 0;
+	genAll.okDistOnlyNumLast = 0;
+	
+	initDB(city);
+		
 	var nextIJFirst = function () {
 		++jFirst;
 		if (jFirst>=numX) {
@@ -155,9 +171,9 @@ function genAll(city, p, step, pp) {
 			var eclipseNumZJ = total - genAll.okZJNum;
 			var eclipseNumDist = total - genAll.okDistOnlyNum;
 			
-			var spGJ = (genAll.okGJNum)/time; spGJ = parseInt(spGJ);
-			var spZJ = (genAll.okZJNum)/time; spZJ = parseInt(spZJ);
-			var spDist = (genAll.okDistOnlyNum)/time; spDist = parseInt(spDist);
+			var spGJ = (genAll.okGJNum-genAll.okGJNumLast)/time; spGJ = parseInt(spGJ);
+			var spZJ = (genAll.okZJNum-genAll.okZJNumLast)/time; spZJ = parseInt(spZJ);
+			var spDist = (genAll.okDistOnlyNum-genAll.okDistOnlyNumLast)/time; spDist = parseInt(spDist);
 			
 			var hGJ = (eclipseNumGJ)/(spGJ*3600); hGJ = parseInt(hGJ);
 			var mGJ = ((eclipseNumGJ)/(spGJ*60))%60; mGJ = parseInt(mGJ);
@@ -176,7 +192,14 @@ function genAll(city, p, step, pp) {
 			$("#genAllProcess").append("<p>finished_gj: "+genAll.okGJNum+","+genAll.okGJBDNum+",速度_gj: "+spGJ+",剩余时间: "+hGJ+"小时,"+mGJ+"分钟,"+sGJ+"秒"+"</p>");
 			$("#genAllProcess").append("<p>finished_zj: "+genAll.okZJNum+","+genAll.okZJBDNum+",速度_zj: "+spZJ+",剩余时间: "+hZJ+"小时,"+mZJ+"分钟,"+sZJ+"秒"+"</p>");
 			$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",速度_zj: "+spDist+",剩余时间: "+hDist+"小时,"+mDist+"分钟,"+sDist+"秒"+"</p>");
+		} else {
+			flushcache();
 		}
+		
+		tm_start = new Date().getTime();
+		genAll.okGJNumLast = genAll.okGJNum;
+		genAll.okZJNumLast = genAll.okZJNum;
+		genAll.okDistOnlyNumLast = genAll.okDistOnlyNum;
 	}, 0);
 
 	//对于超时的请求，负责重新处理
@@ -248,70 +271,73 @@ function push2cache(o) {
 	sendDist.cache.push(o);
 
 	if (sendDist.cache.length >= PER_NUM) {
-		var cache = sendDist.cache;
-		sendDist.cache = [];
-		
-		var p1x = "";
-		var p1y = "";
-		var p2x = "";
-		var p2y = "";
-		var city = "";
-		var dist = "";
-		var dist_zj = "";
-		var dist_gj = "";
-		var time = "";
-		var zj = false;
-		var gj = false;
-		var distOnly = false;
-		
-		p1x = cache[0].p1x;
-			p1y = cache[0].p1y;
-			p2x = cache[0].p2x;
-			p2y = cache[0].p2y;
-			city = cache[0].city;
-			dist = cache[0].dist;
-			dist_zj = cache[0].dist_zj;
-			dist_gj = cache[0].dist_gj;
-			time_gj = cache[0].time_gj;
-			time_zj = cache[0].time_zj;
-			
-			zj = cache[0].zj;
-			gj = cache[0].gj;
-			distOnly = cache[0].distOnly;
-		for (var i=1; i<cache.length; ++i) {
-			p1x +="," + (cache[i].p1x ? cache[i].p1x : "");
-			p1y +="," + (cache[i].p1y ? cache[i].p1y : "");
-			p2x +="," + (cache[i].p2x ? cache[i].p2x : "");
-			p2y +="," + (cache[i].p2y ? cache[i].p2y : "");
-			dist_zj +="," + (cache[i].dist_zj ? cache[i].dist_zj : "");
-			dist_gj +="," + (cache[i].dist_gj ? cache[i].dist_gj : "");
-			time_gj +="," + (cache[i].time_gj ? cache[i].time_gj : "");
-			time_zj +="," + (cache[i].time_zj ? cache[i].time_zj : "");
-			dist +="," + (cache[i].dist ? cache[i].dist : "");
-		}
-		
-		if (gj) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist_gj:dist_gj,time_gj:time_gj,dist:dist,multi:PER_NUM}, function(result) {
-			if (result == "false") {
-				failCB({p1:p1,p2:p2}, zj, gj, distOnly);
-			} else {
-				genAll.okGJNum = genAll.okGJNum ? (genAll.okGJNum + PER_NUM) : PER_NUM;
-			}
-		});
-		if (zj) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist_zj:dist_zj,time_zj:time_zj,dist:dist,multi:PER_NUM}, function(result) {
-			if (result == "false") {
-				failCB({p1:p1,p2:p2}, zj, gj, distOnly);
-			} else {
-				genAll.okZJNum = genAll.okZJNum ? (genAll.okZJNum + PER_NUM) : PER_NUM;
-			}
-		});
-		if (distOnly) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist:dist,multi:PER_NUM}, function(result) {
-			if (result == "false") {
-				failCB({p1:p1,p2:p2}, zj, gj, distOnly);
-			} else {
-				genAll.okDistOnlyNum = genAll.okDistOnlyNum ? (genAll.okDistOnlyNum + PER_NUM) : PER_NUM;
-			}
-		});
+		flushcache();
 	}
+}
+function flushcache() {
+	var cache = sendDist.cache;
+	sendDist.cache = [];
+	
+	var p1x = "";
+	var p1y = "";
+	var p2x = "";
+	var p2y = "";
+	var city = "";
+	var dist = "";
+	var dist_zj = "";
+	var dist_gj = "";
+	var time = "";
+	var zj = false;
+	var gj = false;
+	var distOnly = false;
+	
+	p1x = cache[0].p1x;
+		p1y = cache[0].p1y;
+		p2x = cache[0].p2x;
+		p2y = cache[0].p2y;
+		city = cache[0].city;
+		dist = cache[0].dist;
+		dist_zj = cache[0].dist_zj;
+		dist_gj = cache[0].dist_gj;
+		time_gj = cache[0].time_gj;
+		time_zj = cache[0].time_zj;
+		
+		zj = cache[0].zj;
+		gj = cache[0].gj;
+		distOnly = cache[0].distOnly;
+	for (var i=1; i<cache.length; ++i) {
+		p1x +="," + (cache[i].p1x ? cache[i].p1x : "");
+		p1y +="," + (cache[i].p1y ? cache[i].p1y : "");
+		p2x +="," + (cache[i].p2x ? cache[i].p2x : "");
+		p2y +="," + (cache[i].p2y ? cache[i].p2y : "");
+		dist_zj +="," + (cache[i].dist_zj ? cache[i].dist_zj : "");
+		dist_gj +="," + (cache[i].dist_gj ? cache[i].dist_gj : "");
+		time_gj +="," + (cache[i].time_gj ? cache[i].time_gj : "");
+		time_zj +="," + (cache[i].time_zj ? cache[i].time_zj : "");
+		dist +="," + (cache[i].dist ? cache[i].dist : "");
+	}
+	
+	if (gj) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist_gj:dist_gj,time_gj:time_gj,dist:dist,multi:PER_NUM}, function(result) {
+		if (result == "false") {
+			failCB({p1:p1,p2:p2}, zj, gj, distOnly);
+		} else {
+			genAll.okGJNum = genAll.okGJNum ? (genAll.okGJNum + PER_NUM) : PER_NUM;
+		}
+	});
+	if (zj) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist_zj:dist_zj,time_zj:time_zj,dist:dist,multi:PER_NUM}, function(result) {
+		if (result == "false") {
+			failCB({p1:p1,p2:p2}, zj, gj, distOnly);
+		} else {
+			genAll.okZJNum = genAll.okZJNum ? (genAll.okZJNum + PER_NUM) : PER_NUM;
+		}
+	});
+	if (distOnly) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist:dist,multi:PER_NUM}, function(result) {
+		if (result == "false") {
+			failCB({p1:p1,p2:p2}, zj, gj, distOnly);
+		} else {
+			genAll.okDistOnlyNum = genAll.okDistOnlyNum ? (genAll.okDistOnlyNum + PER_NUM) : PER_NUM;
+		}
+	});
 }
 function getDistZJ(city, p1, p2, disable) {
 	if (disable) {
@@ -497,13 +523,13 @@ function closeDB(city) {
 			}});
 }
 function clearInc() {
-	var url = "../dbop";
+	var url = "../addp1p2dist";
 	$.ajax({url:url,
 			dataType:"text",
 			async:false,
-			data:{city:city,op:"clearInc"},
+			data:{clearInc:"true"},
 			success:function (data, txtStatus) {
-				$(txtout).append("<p>clearInc.</p>");
+				$(txtoutdetail).append("<p>clearInc success.</p>");
 			}});
 }
 
