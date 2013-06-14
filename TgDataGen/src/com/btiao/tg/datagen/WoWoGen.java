@@ -1,7 +1,6 @@
 package com.btiao.tg.datagen;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,6 +75,7 @@ public class WoWoGen extends Gen {
 		
 		shopsTmp.clear();
 		
+		@SuppressWarnings("unchecked")
 		List<Node> shopNodes = (List<Node>)tgNode.selectNodes("data/shops/shop");
 		for (Node shopNode : shopNodes) {
 			TgShop shop = new TgShop();
@@ -98,6 +98,7 @@ public class WoWoGen extends Gen {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void preGen() {
 		tgNodes = (List<Node>)doc.selectNodes("/urlset/url");

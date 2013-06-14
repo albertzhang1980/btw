@@ -1,7 +1,5 @@
 package com.btiao.tg;
 
-import java.util.List;
-
 public class TgData {
 	public static class TgType {
 		static public final int unkown = 0; //不能识别的，若出现则需要处理

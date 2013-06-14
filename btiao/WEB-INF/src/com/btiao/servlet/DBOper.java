@@ -13,6 +13,11 @@ import com.btiao.service.P2PInfoMgr;
 
 public class DBOper extends HttpServlet {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5589029591678194814L;
+
+	/**
 	 * op=init or close
 	 * city=
 	 */

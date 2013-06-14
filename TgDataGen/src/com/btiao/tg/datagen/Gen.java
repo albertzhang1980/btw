@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Document;
-import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
 import com.btiao.tg.TgData;

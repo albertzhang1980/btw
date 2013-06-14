@@ -4,7 +4,6 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +65,6 @@ public class AllTgMgr {
 	
 	private void initTg2Mem() {
 		try {
-			String cur = System.getProperty("user.dir"); 
-			
 			Connection cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgDBId+";ifexist=true", "SA", "");
 			Statement s = cn.createStatement();
 			String sql = "select * from tb_tg";

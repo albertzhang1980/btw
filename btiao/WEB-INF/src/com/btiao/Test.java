@@ -15,6 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class Test extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6622733955497445503L;
+
 	static public void main(String[] args) throws Exception {
 		String DBDIR = ".."+File.separator+"TgDataGen"+File.separator+"genTest"+File.separator+"db";
 		String tgDBId = "tgdb";

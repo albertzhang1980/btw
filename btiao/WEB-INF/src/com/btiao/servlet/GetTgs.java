@@ -16,6 +16,11 @@ import com.btiao.tg.TgData;
 
 public class GetTgs extends HttpServlet {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6625752365429394531L;
+
+	/**
 	 * 输入：
 	 * handle=123&pgs=123;
 	 * 返回格式

@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.btiao.service.P2PInfoMgr;
 
 public class P2PInfo2DB extends HttpServlet {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6160819116981605014L;
 	static public void main(String[] args) throws Exception {
 		int i = (int)Integer.parseInt("1.1");
 		System.out.println(i);
