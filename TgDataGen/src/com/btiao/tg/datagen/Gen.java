@@ -19,7 +19,7 @@ import com.btiao.tg.TgData;
 import com.btiao.tg.TgShop;
 
 public abstract class Gen {
-	static public String DBDIR = "e:\\tgdb";
+	static public String DBDIR = "btdbdir";
 	static public String ORIGIN_TG_DIR = "originTg";
 	
 	static public String tgDBId = "tgdb";

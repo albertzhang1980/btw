@@ -41,13 +41,13 @@ public class P2PInfo2DB extends HttpServlet {
 
 				boolean rOne = false;
 				
-				if (args.get("dist_gj") != null && args.get("dist_gj").length > 0) {
+				if (!args.get("dist_gj")[0].startsWith(".")) {
 					String[] splitGJ = args.get("dist_gj")[0].split(",");
 					String[] splitTime = args.get("time_gj")[0].split(",");
 					int time = (int)Float.parseFloat(splitTime[i]);
 					int dist_gj = (int)Float.parseFloat(splitGJ[i]);
 					rOne = P2PInfoMgr.instance().toDBGJ(city,p1x,p1y,p2x,p2y,dist_gj, time, dist);
-				} else if (args.get("dist_zj") != null && args.get("dist_zj").length > 0) {
+				} else if (!args.get("dist_zj")[0].startsWith(".")) {
 					String[] splitZJ = args.get("dist_zj")[0].split(",");
 					String[] splitTime = args.get("time_zj")[0].split(",");
 					int time = (int)Float.parseFloat(splitTime[i]);

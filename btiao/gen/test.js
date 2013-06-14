@@ -66,7 +66,7 @@ var p2 = judgeNm(p1, 1*1000, 1*1000);
 var city = "beijing";
 
 	var INTERVAL = 700;
-	var INTERVAL_NUM = 1000;
+	var INTERVAL_NUM = 5000;
 	var INTERVAL_FAILED = 5000;
 	var PER_NUM = 100;
 	
@@ -82,6 +82,7 @@ function genAll(city, p, step, pp) {
 	
 	var total = numX*numY*(numX*numY-1); total = parseInt(total);
 	
+	var tm_begin = new Date().getTime();
 	var tm_start = new Date().getTime();
 	var tm_end = new Date().getTime();
 	
@@ -140,8 +141,8 @@ function genAll(city, p, step, pp) {
 				p2 = judgeNm(p, iSecond*step, jSecond*step);
 				
 				if (!(p1.x == p2.x && p1.y == p2.y)) {
-					getDistZJ(city, p1, p2, true);
-					getDistGJ(city, p1, p2, true);
+					//getDistZJ(city, p1, p2);
+					//getDistGJ(city, p1, p2);
 					getDistOnly(city, p1, p2);
 				}
 				
@@ -166,6 +167,7 @@ function genAll(city, p, step, pp) {
 			
 			tm_end = new Date().getTime();
 			var time = (tm_end-tm_start)/1000;
+			var useTime = (tm_end-tm_begin)/1000;
 
 			var eclipseNumGJ = total - genAll.okGJNum;
 			var eclipseNumZJ = total - genAll.okZJNum;
@@ -188,10 +190,10 @@ function genAll(city, p, step, pp) {
 			var sDist = ((eclipseNumDist)/spDist)%60; sDist = parseInt(sDist);
 			
 			$("#genAllProcess").empty();
-			$("#genAllProcess").append("<p>total: "+total+",已使用时间: "+parseInt(time/3600)+"小时,"+parseInt(time/60)%60+"分钟,"+parseInt(time)%60+"秒"+"</p>");
+			$("#genAllProcess").append("<p>total: "+total+",已使用时间: "+parseInt(useTime/3600)+"小时,"+parseInt(useTime/60)%60+"分钟,"+parseInt(useTime)%60+"秒"+"</p>");
 			$("#genAllProcess").append("<p>finished_gj: "+genAll.okGJNum+","+genAll.okGJBDNum+",速度_gj: "+spGJ+",剩余时间: "+hGJ+"小时,"+mGJ+"分钟,"+sGJ+"秒"+"</p>");
 			$("#genAllProcess").append("<p>finished_zj: "+genAll.okZJNum+","+genAll.okZJBDNum+",速度_zj: "+spZJ+",剩余时间: "+hZJ+"小时,"+mZJ+"分钟,"+sZJ+"秒"+"</p>");
-			$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",速度_zj: "+spDist+",剩余时间: "+hDist+"小时,"+mDist+"分钟,"+sDist+"秒"+"</p>");
+			$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",速度_dist: "+spDist+",剩余时间: "+hDist+"小时,"+mDist+"分钟,"+sDist+"秒"+"</p>");
 		} else {
 			flushcache();
 		}
@@ -201,50 +203,94 @@ function genAll(city, p, step, pp) {
 		genAll.okZJNumLast = genAll.okZJNum;
 		genAll.okDistOnlyNumLast = genAll.okDistOnlyNum;
 	}, 0);
-
-	//对于超时的请求，负责重新处理
-	setTimeout(function() {
-		var NUM = total;
-		
-		if ((genAll.okZJNum && genAll.okGJNum && genAll.okDistOnlyNum) &&
-			!(genAll.okZJNum < NUM) && !(genAll.okGJNum < NUM) && !(genAll.okDistOnlyNum < NUM)) {
-			$("#txtout").append("genAll exe all success!!!");
-			closeDB(city);
-			return;
-		}
-		
-		//1次处理10个
-		var exeNumZJ = 0;
-		if (genAll.okZJNum < NUM && genAll.failsZJ) {
-			while (genAll.failsZJ.length > 0 && exeNumZJ++ < 10) {
-				var one = genAll.failsZJ.shift();
-				getDistZJ(city, one.p1, one.p2);
-			}
-		}
-		
-		var exeNumGJ = 0;
-		if (genAll.okGJNum < NUM && genAll.failsGJ) {
-			while (genAll.failsGJ.length > 0 && exeNumGJ++ < 10) {
-				var one = genAll.failsGJ.shift();
-				getDistGJ(city, one.p1, one.p2);
-			}
-		}
-		
-		var exeNumDist = 0;
-		if (genAll.okDistOnlyNum < NUM && genAll.failsDist) {
-			while (genAll.failsDist.length > 0 && exeNumDist++ < 10) {
-				var one = genAll.failsDist.shift();
-				getDistOnly(city, one.p1, one.p2);
-			}
-		}
-		
-		//剩下的延迟x秒下处理
-		setTimeout(arguments.callee, INTERVAL_FAILED);
-	}, INTERVAL_FAILED);
 }
-function sendDist(d, cb) {
+function push2cache(o) {
+	if (!sendDist.cache) {
+		sendDist.cache = [];
+	}
+	sendDist.cache.push(o);
+
+	if (sendDist.cache.length >= PER_NUM) {
+		flushcache();
+	} else if (sendDist.cache.length >= PER_NUM/2) {
+		flushFailCache();
+	}
+}
+function flushFailCache() {
+	if (!sendDist.blockCache) {
+		return;
+	}
+	
+	for (var i=0; i<sendDist.blockCache.length; ++i) {
+		sendDist(sendDist.blockCache[i]);
+	}
+}
+function flushcache() {
+	var cache = sendDist.cache;
+	sendDist.cache = [];
+
+	var start = 0;
+	while (start<cache.length) {
+		flushCacheBlock(cache, start, PER_NUM);
+		
+		start += PER_NUM;
+	}
+}
+function zlWrapper(d) {
+	this.d = d;
+}
+function flushCacheBlock(cache, start, num) {
+	var p1x = cache[start].p1x;
+	var p1y = cache[start].p1y;
+	var p2x = cache[start].p2x;
+	var p2y = cache[start].p2y;
+	var city = cache[start].city;
+	var dist = cache[start].dist;
+	var dist_zj = cache[start].dist_zj ? cache[start].dist_zj : ".";
+	var dist_gj = cache[start].dist_gj ? cache[start].dist_gj : ".";
+	var time_gj = cache[start].time_gj ? cache[start].time_gj : ".";
+	var time_zj = cache[start].time_zj ? cache[start].time_zj : ".";
+	
+	var end = start + num;
+	var i=start+1;
+	for (; i<end && i<cache.length; ++i) {
+		p1x +="," + (cache[i].p1x ? cache[i].p1x : ".");
+		p1y +="," + (cache[i].p1y ? cache[i].p1y : ".");
+		p2x +="," + (cache[i].p2x ? cache[i].p2x : ".");
+		p2y +="," + (cache[i].p2y ? cache[i].p2y : ".");
+		dist_zj +="," + (cache[i].dist_zj ? cache[i].dist_zj : ".");
+		dist_gj +="," + (cache[i].dist_gj ? cache[i].dist_gj : ".");
+		time_gj +="," + (cache[i].time_gj ? cache[i].time_gj : ".");
+		time_zj +="," + (cache[i].time_zj ? cache[i].time_zj : ".");
+		dist +="," + (cache[i].dist ? cache[i].dist : ".");
+	}
+	
+	var sendNum = i-start;
+	if (sendNum > 0) {
+		sendDist(new zlWrapper({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,
+			dist_zj:dist_zj,dist_gj:dist_gj,
+			time_zj:time_zj,time_gj:time_gj,
+			dist:dist,multi:sendNum}));
+	}
+}
+function sendDist(d) {
 	var url = "../addp1p2dist";
-	$.get(url, d, cb);
+	
+	$.ajax({url:url, data:d.d, dataType:"text",success:function(result) {
+		if (result == "true"){
+			if (genAll.okDistOnlyNum) {
+				genAll.okDistOnlyNum += d.d.multi;
+			} else {
+				genAll.okDistOnlyNum = d.d.multi;
+			}
+		} else {
+			if (!sendDist.blockCache) {
+				sendDist.blockCache = [];
+			}
+			sendDist.blockCache.push(d);
+		}
+		d = null;
+	}});
 }
 function cvtP(p) {
 	var r = {x:parseInt(p.x*1000000),y:parseInt(p.y*1000000)};
@@ -262,89 +308,9 @@ function getDistOnly(city, p1, p2) {
 	//genAll.okDistOnlyNum = genAll.okDistOnlyNum ? (genAll.okDistOnlyNum + 1) : 1;
 	//return;
 	genAll.okDistOnlyBDNum = genAll.okDistOnlyBDNum ? (genAll.okDistOnlyBDNum + 1) : 1;
-	push2cache({city:city,p1x:P1.x,p1y:P1.y,p2x:P2.x,p2y:P2.y,dist:lineDist, zj:false, gj:false, distOnly:true});
-}
-function push2cache(o) {
-	if (!sendDist.cache) {
-		sendDist.cache = [];
-	}
-	sendDist.cache.push(o);
-
-	if (sendDist.cache.length >= PER_NUM) {
-		flushcache();
-	}
-}
-function flushcache() {
-	var cache = sendDist.cache;
-	sendDist.cache = [];
-	
-	var p1x = "";
-	var p1y = "";
-	var p2x = "";
-	var p2y = "";
-	var city = "";
-	var dist = "";
-	var dist_zj = "";
-	var dist_gj = "";
-	var time = "";
-	var zj = false;
-	var gj = false;
-	var distOnly = false;
-	
-	p1x = cache[0].p1x;
-		p1y = cache[0].p1y;
-		p2x = cache[0].p2x;
-		p2y = cache[0].p2y;
-		city = cache[0].city;
-		dist = cache[0].dist;
-		dist_zj = cache[0].dist_zj;
-		dist_gj = cache[0].dist_gj;
-		time_gj = cache[0].time_gj;
-		time_zj = cache[0].time_zj;
-		
-		zj = cache[0].zj;
-		gj = cache[0].gj;
-		distOnly = cache[0].distOnly;
-	for (var i=1; i<cache.length; ++i) {
-		p1x +="," + (cache[i].p1x ? cache[i].p1x : "");
-		p1y +="," + (cache[i].p1y ? cache[i].p1y : "");
-		p2x +="," + (cache[i].p2x ? cache[i].p2x : "");
-		p2y +="," + (cache[i].p2y ? cache[i].p2y : "");
-		dist_zj +="," + (cache[i].dist_zj ? cache[i].dist_zj : "");
-		dist_gj +="," + (cache[i].dist_gj ? cache[i].dist_gj : "");
-		time_gj +="," + (cache[i].time_gj ? cache[i].time_gj : "");
-		time_zj +="," + (cache[i].time_zj ? cache[i].time_zj : "");
-		dist +="," + (cache[i].dist ? cache[i].dist : "");
-	}
-	
-	if (gj) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist_gj:dist_gj,time_gj:time_gj,dist:dist,multi:PER_NUM}, function(result) {
-		if (result == "false") {
-			failCB({p1:p1,p2:p2}, zj, gj, distOnly);
-		} else {
-			genAll.okGJNum = genAll.okGJNum ? (genAll.okGJNum + PER_NUM) : PER_NUM;
-		}
-	});
-	if (zj) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist_zj:dist_zj,time_zj:time_zj,dist:dist,multi:PER_NUM}, function(result) {
-		if (result == "false") {
-			failCB({p1:p1,p2:p2}, zj, gj, distOnly);
-		} else {
-			genAll.okZJNum = genAll.okZJNum ? (genAll.okZJNum + PER_NUM) : PER_NUM;
-		}
-	});
-	if (distOnly) sendDist({city:city,p1x:p1x,p1y:p1y,p2x:p2x,p2y:p2y,dist:dist,multi:PER_NUM}, function(result) {
-		if (result == "false") {
-			failCB({p1:p1,p2:p2}, zj, gj, distOnly);
-		} else {
-			genAll.okDistOnlyNum = genAll.okDistOnlyNum ? (genAll.okDistOnlyNum + PER_NUM) : PER_NUM;
-		}
-	});
+	push2cache({city:city,p1x:P1.x,p1y:P1.y,p2x:P2.x,p2y:P2.y,dist:lineDist});
 }
 function getDistZJ(city, p1, p2, disable) {
-	if (disable) {
-		genAll.okZJNum = genAll.okZJNum ? (genAll.okZJNum + 1) : 1;
-		return;
-	}
-
 	//alert(p1.x);alert(p1.y);alert(p2.x);alert(p2.y);
 	var options = {
 		policy: BMAP_DRIVING_POLICY_LEAST_TIME,
@@ -382,7 +348,7 @@ function getDistZJ(city, p1, p2, disable) {
 				
 				genAll.okZJBDNum = genAll.okZJBDNum ? (genAll.okZJBDNum + 1) : 1;
 				
-				push2cache({city:city,p1x:P1.x,p1y:P1.y,p2x:P2.x,p2y:P2.y,dist_zj:totalDist, time_zj:time, dist:lineDist,zj:true, gj:false, distOnly:false});
+				push2cache({city:city,p1x:P1.x,p1y:P1.y,p2x:P2.x,p2y:P2.y,dist_zj:totalDist, time_zj:time, dist:lineDist});
 				/*
 				sendDist({city:city,p1x:P1.x,p1y:P1.y,p2x:P2.x,p2y:P2.y,dist_zj:totalDist, time_zj:time, dist:lineDist}, function (result) {
 					if (result == "false") {
@@ -401,11 +367,6 @@ function getDistZJ(city, p1, p2, disable) {
 	driving.search(new BMap.Point(p1.x, p1.y), new BMap.Point(p2.x, p2.y));
 }
 function getDistGJ(city, p1, p2, disable) {
-	if (disable) {
-		genAll.okGJNum = genAll.okGJNum ? (genAll.okGJNum + 1) : 1;
-		return;
-	}
-
 	var P1 = cvtP(p1);
 	var P2 = cvtP(p2);
 	
@@ -460,7 +421,7 @@ function getDistGJ(city, p1, p2, disable) {
 			var P1 = cvtP(p1);
 			var P2 = cvtP(p2);
 			genAll.okZJBDNum = genAll.okZJBDNum ? (genAll.okZJBDNum + 1) : 1;
-			push2cache({city:city,p1x:P1.x,p1y:P1.y,p2x:P2.x,p2y:P2.y,dist_gj:totalDist, time_gj:time, dist:lineDist,zj:false, gj:true, distOnly:false});
+			push2cache({city:city,p1x:P1.x,p1y:P1.y,p2x:P2.x,p2y:P2.y,dist_gj:totalDist, time_gj:time, dist:lineDist});
 			/*
 			sendDist({city:city,p1x:P1.x,p1y:P1.y,p2x:P2.x,p2y:P2.y,dist_gj:totalDist, time_gj:time, dist:lineDist}, function (result) {
 				if (result == "false") {
