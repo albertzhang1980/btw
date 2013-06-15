@@ -16,11 +16,11 @@
     </servlet>
     <servlet>
       <servlet-name>P2PInfo2DB</servlet-name>
-      <servlet-class>com.btiao.servlet.P2PInfo2DB</servlet-class>
+      <servlet-class>com.btiao.servlet.gen.P2PInfo2DB</servlet-class>
     </servlet>
     <servlet>
       <servlet-name>dbop</servlet-name>
-      <servlet-class>com.btiao.servlet.DBOper</servlet-class>
+      <servlet-class>com.btiao.servlet.gen.DBOper</servlet-class>
     </servlet>
   
     <servlet-mapping>

@@ -1,4 +1,4 @@
-package com.btiao.service;
+package com.btiao.service.gen;
 
 import java.io.File;
 import java.sql.Connection;
@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.btiao.service.AllTgMgr;
 
 public class P2PInfoMgr {
 	static private P2PInfoMgr inst = null;
@@ -157,6 +159,9 @@ public class P2PInfoMgr {
 			"PRIMARY KEY(p1x,p1y,p2x,p2y)" +
 			")";
 		s.execute(sql);
+		s.execute("CREATE INDEX dist ON tb_p2pinfo_gj(dgj)");
+		s.execute("CREATE INDEX dist ON tb_p2pinfo_gj(tgj)");
+		s.execute("CREATE INDEX dist ON tb_p2pinfo_dist(dist)");
 		
 		sql = "CREATE CACHED TABLE tb_p2pinfo_zj (" +
 			"p1x INTEGER, p1y INTEGER, p2x INTEGER, p2y INTEGER," +
@@ -164,6 +169,9 @@ public class P2PInfoMgr {
 			"PRIMARY KEY(p1x,p1y,p2x,p2y)" +
 			")";
 		s.execute(sql);
+		s.execute("CREATE INDEX dist ON tb_p2pinfo_zj(zgj)");
+		s.execute("CREATE INDEX dist ON tb_p2pinfo_zj(zgj)");
+		s.execute("CREATE INDEX dist ON tb_p2pinfo_zj(dist)");
 		
 		sql = "CREATE CACHED TABLE tb_p2pinfo_dist (" +
 			"p1x INTEGER, p1y INTEGER, p2x INTEGER, p2y INTEGER," +
@@ -171,6 +179,7 @@ public class P2PInfoMgr {
 			"PRIMARY KEY(p1x,p1y,p2x,p2y)" +
 			")";
 		s.execute(sql);
+		s.execute("CREATE INDEX dist ON tb_p2pinfo_dist(dist)");
 	}
 	private void insertGJ(Statement s, int p1x, int p1y, int p2x, int p2y, int dgj, int tgj, int dist) throws Exception {
 		String sql = "INSERT INTO tb_p2pinfo_gj (p1x,p1y,p2x,p2y,dgj,tgj,dist) VALUES (" +
@@ -260,7 +269,7 @@ public class P2PInfoMgr {
 		int times = 4;
 		do {
 			try {
-				Connection cn = DriverManager.getConnection("jdbc:hsqldb:file:"+AllTgMgr.DBDIR+File.separator+city+(create?"":";ifexist=true"), "SA", "");
+				Connection cn = DriverManager.getConnection("jdbc:hsqldb:file:"+AllTgMgr.DBDIR+File.separator+posDBId+"."+city+(create?"":";ifexist=true"), "SA", "");
 				return cn;
 			} catch (Exception e) {
 				try {
@@ -278,5 +287,6 @@ public class P2PInfoMgr {
 	private volatile int cpool_size = 0;
 	private volatile int cpool_max_size = 100;
 	private Map<String,Boolean> initCity = new HashMap<String,Boolean>();
-//	private Map<String,Connection> city2Con = new HashMap<String,Connection>();
+	
+	private String posDBId = "pos";
 }
