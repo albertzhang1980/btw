@@ -18,48 +18,16 @@ import com.btiao.tg.TgData;
 import com.btiao.tg.TgShop;
 
 public abstract class Gen {
-	static public String DBDIR = "btdbdir";
-	static public String ORIGIN_TG_DIR = "originTg";
-	
-	static public String tgDBId = "tgdb";
-	static public String tgSearchDBId = "tgschdb";
-	static public String shopDBId = "shopdb";
-	static public String shopSearchDBId = "shopschdb";
-	
-	static protected Map<String,String> dbTgs = new HashMap<String,String>();
-	static protected Map<String,String> dbShops = new HashMap<String,String>();
-	
-	static private Connection tgCon;
-	static private Connection tgShopCon;
-	static private Connection tgSearchCon;
-	
-	static public void genAll() throws Exception {
-		long t1 = System.currentTimeMillis();
-		init();
-		long t11 = System.currentTimeMillis();
-		WoWoGen wGen = new WoWoGen("wowo.xml");
-		wGen.preGen();
-		wGen.toDB();
-		wGen.postGen();
-		long t2 = System.currentTimeMillis();
-		shutdownDB(tgCon);
-		shutdownDB(tgShopCon);
-		shutdownDB(tgSearchCon);
-		long t3 = System.currentTimeMillis();
-		
-		System.out.println("t1~t11: "+(t11-t1)/60000+"min");
-		System.out.println("t11~t2: "+(t2-t11)/60000+"min");
-		System.out.println("t2~t3: "+(t3-t2)/1000+"s");
-	}
-	
 	static public void main(String[] args) throws Exception {
-//		DBDIR = "genTest"+File.separator + "db";
-//		ORIGIN_TG_DIR = "genTest"+File.separator;
+		List<Gen> gens = new ArrayList<Gen>();
 		
-		long t1 = System.currentTimeMillis();
-		genAll();
-		long t2 = System.currentTimeMillis();
-		System.out.println("time: " + (t2-t1) + "ms");
+		Gen wowoGen = new WoWoGen();
+		gens.add(wowoGen);
+		
+		Gen.setCity("beijing");
+		Gen.initDB();
+		Gen.genAll(gens);
+		Gen.shutdownDB();
 		
 		try {
 			assert(false);
@@ -69,14 +37,7 @@ public abstract class Gen {
 		}
 	}
 	
-	static void shutdownDB(Connection cn) throws Exception {
-		Statement s = cn.createStatement();
-		s.execute("SHUTDOWN");
-		s.close();
-		cn.close();
-	}
-	
-	static void clearAllDB() {
+	static public void clearAllDB() {
 		File dir = new File(DBDIR);
 		File[] files = dir.listFiles();
 		if (files == null) {
@@ -88,30 +49,29 @@ public abstract class Gen {
 		}
 	}
 	
-	/**
-	 * 初始化Gen的静态数据。
-	 */
-	static protected void init() throws Exception {
-		clearAllDB();
-		
-		tgSearchCon = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgSearchDBId, "SA", "");
-		tgCon = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgDBId, "SA", "");
-		tgShopCon = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+shopDBId, "SA", "");
-		
-		try {
-			Statement s = tgSearchCon.createStatement();
-			String sql = "CREATE TABLE tb_tg(" +
-					"type INTEGER NOT NULL," +
-					"url VARCHAR(256) NOT NULL," +
-					"endTime BIGINT NOT NULL," +
-					"useEndTime BIGINT NOT NULL," +
-					"PRIMARY KEY(url)" +
-					")";
-			s.execute(sql);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
+	static public void genAll(List<Gen> gens) throws Exception {
+		for (Gen gen : gens) {
+			gen.init();
+			gen.toDB();
 		}
+	}
+	
+	static public void shutdownDB() throws Exception {
+		shutdownDB(tgCon);
+		shutdownDB(tgShopCon);
+	}
+	
+	static public void setCity(String acity) {
+		city = acity;
+	}
+	
+	/**
+	 * 初始化DB
+	 * @throws Exception
+	 */
+	static public void initDB() throws Exception {
+		tgCon = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgDBId+"."+city, "SA", "");
+		tgShopCon = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgShopDBId+"."+city, "SA", "");
 		
 		try {
 			Statement s = tgCon.createStatement();
@@ -152,7 +112,54 @@ public abstract class Gen {
 		}
 	}
 	
-	static protected long tmStr2Long(String tm) {
+	static private void shutdownDB(Connection cn) throws Exception {
+		Statement s = cn.createStatement();
+		s.execute("SHUTDOWN COMPACT");
+		s.close();
+		cn.close();
+	}
+	
+	static public String DBDIR = "btdbdir";
+	static public String ORIGIN_TG_DIR = "originTg";
+	
+	static public final String tgDBId = "tg";
+	static public final String tgShopDBId= "tgshop";
+	
+	static protected Map<String,String> dbTgs = new HashMap<String,String>();
+	static protected Map<String,String> dbShops = new HashMap<String,String>();
+	
+	static private Connection tgCon;
+	static private Connection tgShopCon;
+	
+	static protected String city;
+
+	/**
+	 * 初始化Gen的静态数据。
+	 */
+	public void init() throws Exception {
+		String originTgXmlFn = getTgXMLFn();
+		SAXReader reader = new SAXReader();
+		doc = reader.read(new File(ORIGIN_TG_DIR+File.separator+originTgXmlFn));
+	}
+	
+
+	
+	public void toDB() throws Exception {
+		preGen();
+		
+		while (genTg()) {
+			if (alreadyAddedTg()) {
+				continue;
+			}
+			
+			insertTg();
+			insertShop();
+		}
+		
+		postGen();
+	}
+	
+	protected long tmStr2Long(String tm) {
 		try {
 			SimpleDateFormat fm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			Date date = fm.parse(tm);
@@ -168,7 +175,7 @@ public abstract class Gen {
 	 * @param str
 	 * @return
 	 */
-	static protected Integer priceStr2Int(String str) {
+	protected Integer priceStr2Int(String str) {
 		try {
 			float r = Float.parseFloat(str);
 			
@@ -178,7 +185,7 @@ public abstract class Gen {
 		}
 	}
 	
-	static protected Integer str2Int(String str) {
+	protected Integer str2Int(String str) {
 		try {
 			int r = Integer.parseInt(str);
 			
@@ -188,33 +195,13 @@ public abstract class Gen {
 		}
 	}
 	
-	static protected long doubleLatLon2Long(String d) {
+	protected long doubleLatLon2Long(String d) {
 		try {
 			double dlong = Double.parseDouble(d);
 			return (long)(dlong*1000*1000);
 		} catch (Exception e) {
 			return (0xffffffffffffffffL);
 		}
-	}
-	
-	public void toDB() throws Exception {
-		while (genTg()) {
-			if (alreadyAddedTg()) {
-				continue;
-			}
-			
-			insertTg();
-			insertShop();
-		}
-	}
-	
-	protected final Document doc;
-	protected TgData tgTmp;
-	protected List<TgShop> shopsTmp = new ArrayList<TgShop>();
-	
-	protected Gen(String originTgXmlFn) throws Exception {
-		SAXReader reader = new SAXReader();
-		doc = reader.read(new File(ORIGIN_TG_DIR+File.separator+originTgXmlFn));
 	}
 	
 	protected void insertTg() throws Exception {
@@ -235,6 +222,56 @@ public abstract class Gen {
 		
 		dbTgs.put(tgTmp.url, "");
 	}
+
+	/**
+	 * 每次调用产生一条团购信息，填写到tgTmp和shopsTmp中。
+	 * @return true表示是否取到了下一条团购数据。
+	 */
+	protected abstract boolean genTg();
+	
+	/**
+	 * 返回团购网站名称
+	 * @return
+	 */
+	protected abstract String getName();
+	
+	protected abstract void preGen();
+	protected abstract void postGen() throws Exception ;
+	
+	private String getTgXMLFn() {
+		return getName()+"."+city+".xml";
+	}
+	
+	private boolean alreadyAddedTg() {
+		if (dbTgs.containsKey(tgTmp.url)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	private String genInsertShopSql(TgShop shop) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("INSERT INTO tb_shop ");
+		sb.append("(longitude,latitude,addr,name,tel) VALUES(");
+		sb.append(shop.longitude);sb.append(",");
+		sb.append(shop.latitude);sb.append(",");
+		sb.append(normalTxt2Sqltxt(shop.addr));sb.append(",");
+		sb.append(normalTxt2Sqltxt(shop.name));sb.append(",");
+		sb.append(normalTxt2Sqltxt(shop.tel));
+		sb.append(")");
+		
+		return sb.toString();
+	}
+	
+	private String normalTxt2Sqltxt(String str) {
+		//str = "'\\%_/<>";
+		return "'" + 
+			str.replace("'", "''") +
+			"\'";
+	}
+	
 	
 	private String genInsertTgSql(TgData tg) {
 		StringBuilder sb = new StringBuilder();
@@ -259,7 +296,7 @@ public abstract class Gen {
 		return sb.toString();
 	}
 	
-	protected void insertShop() throws Exception {
+	private void insertShop() throws Exception {
 		for (TgShop shop : shopsTmp) {
 			String id = shop.longitude + "," +shop.latitude;
 			if (dbShops.containsKey(id)) {
@@ -278,42 +315,7 @@ public abstract class Gen {
 		}
 	}
 	
-	private String genInsertShopSql(TgShop shop) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("INSERT INTO tb_shop ");
-		sb.append("(longitude,latitude,addr,name,tel) VALUES(");
-		sb.append(shop.longitude);sb.append(",");
-		sb.append(shop.latitude);sb.append(",");
-		sb.append(normalTxt2Sqltxt(shop.addr));sb.append(",");
-		sb.append(normalTxt2Sqltxt(shop.name));sb.append(",");
-		sb.append(normalTxt2Sqltxt(shop.tel));
-		sb.append(")");
-		
-		return sb.toString();
-	}
-	
-	private String normalTxt2Sqltxt(String str) {
-		//str = "'\\%_/<>";
-		return "'" + 
-			str.replace("'", "''") +
-			"\'";
-	}
-
-	/**
-	 * 每次调用产生一条团购信息，填写到tgTmp和shopsTmp中。
-	 * @return true表示是否取到了下一条团购数据。
-	 */
-	protected abstract boolean genTg();
-	
-	protected abstract void preGen();
-	protected abstract void postGen() throws Exception ;
-	
-	private boolean alreadyAddedTg() {
-		if (dbTgs.containsKey(tgTmp.url)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+	protected Document doc;
+	protected TgData tgTmp;
+	protected List<TgShop> shopsTmp = new ArrayList<TgShop>();
 }

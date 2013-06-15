@@ -18,7 +18,7 @@ import com.btiao.tg.TgShop;
 public class WoWoGen extends Gen {
 	static public void main(String[] args) throws Exception {
 		Gen.ORIGIN_TG_DIR = "genTest" + File.separator;
-		WoWoGen wo = new WoWoGen("wowo.xml");
+		WoWoGen wo = new WoWoGen();
 		
 		wo.preGen();
 		
@@ -43,10 +43,6 @@ public class WoWoGen extends Gen {
 		} catch (Throwable e) {
 			System.out.println("success!");
 		}
-	}
-	
-	public WoWoGen(String fn) throws Exception {
-		super(fn);
 	}
 
 	@Override
@@ -97,6 +93,11 @@ public class WoWoGen extends Gen {
 			return genTg();
 		}
 	}
+	
+	@Override
+	protected String getName() {
+		return "wowo";
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -112,7 +113,7 @@ public class WoWoGen extends Gen {
 			Set<Entry<String,String>> entrys = unkownTypeStrs.entrySet();
 			for (Entry<String,String> entry : entrys) {
 				fout.write((entry.getKey()+"\n").getBytes());
-			} 
+			}
 		}finally {
 			fout.close();
 		}
@@ -134,5 +135,6 @@ public class WoWoGen extends Gen {
 	private int index = 0;
 	
 	private Map<String,String> unkownTypeStrs = new HashMap<String,String>();
-
+	
+	private String city; 
 }
