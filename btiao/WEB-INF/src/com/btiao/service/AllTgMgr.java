@@ -6,13 +6,15 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.btiao.tg.TgData;
 
 public class AllTgMgr {
 	static public String DBDIR = "btdb";
-	static public String tgDBId = "tgdb";
+	static public String tgDBId = "tg";
 	
 	static private AllTgMgr inst = null;
 	static synchronized public AllTgMgr instance() {
@@ -31,12 +33,17 @@ public class AllTgMgr {
 	
 	/**
 	 * 返回handle对应的团购序列的一页数据。
+	 * @param city 城市标识
 	 * @param handle 标识一个团购序列，为0时表示全部的团购序列。
 	 * @param idx 要获取的数据的起始索引
 	 * @param pgs 要获取的数据的个数
 	 * @return
 	 */
-	public List<TgData> getTg(int handle, int idx, int num) {
+	public List<TgData> getTg(String city, int handle, int idx, int num) {
+		if (!canUse(city)) {
+			initTg2Mem(city);
+		}
+		
 		List<TgData> r = new ArrayList<TgData>();
 		
 		if (handle == 0) {
@@ -55,17 +62,17 @@ public class AllTgMgr {
 		return r;
 	}
 	
-	public boolean canUse() {
-		return successInited;
+	public boolean canUse(String city) {
+		Boolean r = initFlags.get(city);
+		return r != null ? r : false;
 	}
 	
 	private AllTgMgr() {
-		initTg2Mem();
 	}
 	
-	private void initTg2Mem() {
+	private void initTg2Mem(String city) {
 		try {
-			Connection cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgDBId+";ifexist=true", "SA", "");
+			Connection cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgDBId+"."+city+";ifexist=true", "SA", "");
 			Statement s = cn.createStatement();
 			String sql = "select * from tb_tg";
 	
@@ -84,9 +91,9 @@ public class AllTgMgr {
 			return;
 		}
 		
-		successInited = true;
+		initFlags.put(city, true);
 	}
 	
 	private List<TgData> tgs = new ArrayList<TgData>();
-	private boolean successInited = false;
+	private Map<String,Boolean> initFlags = new HashMap<String,Boolean>();
 }

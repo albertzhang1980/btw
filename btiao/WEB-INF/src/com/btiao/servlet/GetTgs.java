@@ -58,6 +58,14 @@ public class GetTgs extends HttpServlet {
 			result = Result.ARG_ERROR;
 		}
 		
+		String city = "";
+		String[] cityArg = args.get("city");
+		if (cityArg != null && cityArg.length > 0) {
+			city = cityArg[0];
+		} else {
+			result = Result.ARG_ERROR;
+		}
+		
 		int handle = 0;
 		String[] handleArg = args.get("handle");
 		if (handleArg != null && handleArg.length > 0) {
@@ -70,10 +78,6 @@ public class GetTgs extends HttpServlet {
 			result = Result.ARG_ERROR;
 		}
 		
-		if (!AllTgMgr.instance().canUse()) {
-			result = Result.TG_ERROR;
-		}
-		
 		if (result != Result.SUCCESS) {
 			PrintWriter out = res.getWriter();
 			out.print("var rst = {result:"+result+",desc:\""+Result.desc(result)+"\",tgs:[]}");
@@ -83,7 +87,7 @@ public class GetTgs extends HttpServlet {
 		
 		PrintWriter out = res.getWriter();
 
-		List<TgData> tgs = AllTgMgr.instance().getTg(handle, idx, pgs);
+		List<TgData> tgs = AllTgMgr.instance().getTg(city, handle, idx, pgs);
 		
 		out.print("var rst = {result:0,tgs:[");
 		
