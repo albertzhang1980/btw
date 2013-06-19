@@ -7,6 +7,8 @@ public class Result {
 	static public int SUCCESS = 0;
 	static public int ARG_ERROR = 1;
 	static public int TG_ERROR = 2;
+	static public int TG_GEN_FDB_FAILED = 3;
+	static public int TG_GEN_FDB_DYNAMIC_FAILED = 3;
 	
 	static public Map<Integer,String> cn = new HashMap<Integer,String>();
 	

@@ -19,6 +19,8 @@ import com.btiao.tg.TgShop;
 
 public abstract class Gen {
 	static public void main(String[] args) throws Exception {
+		clearAllDB();
+		
 		List<Gen> gens = new ArrayList<Gen>();
 		
 		Gen wowoGen = new WoWoGen();
@@ -58,7 +60,6 @@ public abstract class Gen {
 	
 	static public void shutdownDB() throws Exception {
 		shutdownDB(tgCon);
-		shutdownDB(tgShopCon);
 	}
 	
 	static public void setCity(String acity) {
@@ -71,12 +72,13 @@ public abstract class Gen {
 	 */
 	static public void initDB() throws Exception {
 		tgCon = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgDBId+"."+city, "SA", "");
-		tgShopCon = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+tgShopDBId+"."+city, "SA", "");
 		
 		try {
 			Statement s = tgCon.createStatement();
 			String sql = "CREATE TABLE tb_tg(" +
 					"type INTEGER NOT NULL," +
+					"longitude BIGINT NOT NULL," +
+					"latitude BIGINT NOT NULL," +
 					"url VARCHAR(256) NOT NULL," +
 					"title VARCHAR(512) NOT NULL," +
 					"desc VARCHAR(512) NOT NULL," +
@@ -87,7 +89,7 @@ public abstract class Gen {
 					"value INTEGER NOT NULL," +
 					"price INTEGER NOT NULL," +
 					"boughtNum INTEGER NOT NULL," +
-					"PRIMARY KEY(url)" +
+					"PRIMARY KEY(longitude,latitude,url)" +
 					")";
 			s.execute(sql);
 		} catch (Exception e) {
@@ -96,7 +98,7 @@ public abstract class Gen {
 		}
 		
 		try {
-			Statement s = tgShopCon.createStatement();
+			Statement s = tgCon.createStatement();
 			String sql = "CREATE TABLE tb_shop(" +
 					"longitude BIGINT NOT NULL," +
 					"latitude BIGINT NOT NULL," +
@@ -113,6 +115,7 @@ public abstract class Gen {
 	}
 	
 	static private void shutdownDB(Connection cn) throws Exception {
+		cn.commit();
 		Statement s = cn.createStatement();
 		s.execute("SHUTDOWN COMPACT");
 		s.close();
@@ -129,7 +132,6 @@ public abstract class Gen {
 	static protected Map<String,String> dbShops = new HashMap<String,String>();
 	
 	static private Connection tgCon;
-	static private Connection tgShopCon;
 	
 	static protected String city;
 
@@ -211,10 +213,13 @@ public abstract class Gen {
 		
 		String sql = null;
 		try {
-			sql = genInsertTgSql(tgTmp);
 			Statement s = tgCon.createStatement();
-			s.execute(sql);
-			s.execute("CHECKPOINT");
+			for (TgShop shopTmp : shopsTmp) {
+				sql = genInsertTgSql(tgTmp, shopTmp);
+				s.execute(sql);
+			}
+			tgCon.commit();
+			s.close();
 		} catch (Exception e) {
 			System.err.println("sql="+sql);
 			e.printStackTrace();
@@ -273,11 +278,13 @@ public abstract class Gen {
 	}
 	
 	
-	private String genInsertTgSql(TgData tg) {
+	private String genInsertTgSql(TgData tg, TgShop shop) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("INSERT INTO tb_tg ");
-		sb.append("(type,url,title,desc,imageUrl,startTime,endTime,useEndTime,value,price,boughtNum) VALUES(");
+		sb.append("(type,longitude,latitude,url,title,desc,imageUrl,startTime,endTime,useEndTime,value,price,boughtNum) VALUES(");
 		sb.append(tg.type);sb.append(",");
+		sb.append(shop.longitude);sb.append(",");
+		sb.append(shop.latitude);sb.append(",");
 		sb.append(normalTxt2Sqltxt(tg.url));sb.append(",");
 		sb.append(normalTxt2Sqltxt(tg.title));sb.append(",");
 		if (tg.desc.length() > 120) {
@@ -308,7 +315,7 @@ public abstract class Gen {
 			}
 			
 			String sql = genInsertShopSql(shop);
-			Statement s = tgShopCon.createStatement();
+			Statement s = tgCon.createStatement();
 			s.execute(sql);
 			
 			dbShops.put(id, shop.name);

@@ -1,5 +1,8 @@
 package com.btiao.tg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TgData {
 	public static class TgType {
 		static public final int unkown = 0; //不能识别的，若出现则需要处理
@@ -44,6 +47,9 @@ public class TgData {
 	
 	public String url;
 	
+	public long longitude;
+	public long latitude;
+	
 	public String title;
 	public String desc;
 	
@@ -67,4 +73,6 @@ public class TgData {
 	//团购来源
 //	public String nameOfOrigWebSite;
 //	public String urlOfOrigWebSite;
+	
+	public int dist = 0; //距离
 }

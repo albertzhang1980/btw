@@ -65,7 +65,7 @@ var p1 = {x:116.414,y:39.915};
 var p2 = judgeNm(p1, 1*1000, 1*1000);
 var city = "beijing";
 
-	var INTERVAL = 700;
+	var INTERVAL = 1000;
 	var INTERVAL_NUM = 5000;
 	var INTERVAL_FAILED = 5000;
 	var PER_NUM = 100;

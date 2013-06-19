@@ -13,7 +13,18 @@ import java.util.Set;
 import com.btiao.service.AllTgMgr;
 
 public class P2PInfoMgr {
+	static public String DBDIR = "posdb";
+	static public String posDBId = "pos";
+	
 	static private P2PInfoMgr inst = null;
+	
+	static public void main(String[] args) throws Exception {
+		P2PInfoMgr mgr = P2PInfoMgr.instance();
+		String city = "beijing";
+		mgr.toDBGJ(city, 1, 1, 2, 2, 1000, 60, 2000);
+		mgr.closeDB(city);
+	}
+	
 	static public P2PInfoMgr instance() {
 		if (inst == null) {
 			inst = new P2PInfoMgr();
@@ -21,11 +32,17 @@ public class P2PInfoMgr {
 		return inst;
 	}
 	
-	static public void main(String[] args) throws Exception {
-		P2PInfoMgr mgr = P2PInfoMgr.instance();
-		String city = "beijing";
-		mgr.toDBGJ(city, 1, 1, 2, 2, 1000, 60, 2000);
-		mgr.closeDB(city);
+	public static String getPosDBID(String city) {
+		String dbId = DBDIR+File.separator+posDBId+"."+city;
+		return dbId;
+	}
+	
+	static {
+		try { 
+			Class.forName("org.hsqldb.jdbcDriver");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean toDBGJ(String city, int p1x, int p1y, int p2x, int p2y, int dgj, int tgj, int dist) {
@@ -122,7 +139,7 @@ public class P2PInfoMgr {
 			}
 			
 			for (String fn : getDBFns(city)) {
-				File file = new File(AllTgMgr.DBDIR+File.separator+fn);
+				File file = new File(DBDIR+File.separator+fn);
 				file.delete();
 			}
 			
@@ -159,9 +176,9 @@ public class P2PInfoMgr {
 			"PRIMARY KEY(p1x,p1y,p2x,p2y)" +
 			")";
 		s.execute(sql);
-		s.execute("CREATE INDEX dist ON tb_p2pinfo_gj(dgj)");
-		s.execute("CREATE INDEX dist ON tb_p2pinfo_gj(tgj)");
-		s.execute("CREATE INDEX dist ON tb_p2pinfo_dist(dist)");
+		s.execute("CREATE INDEX dgj ON tb_p2pinfo_gj(dgj)");
+		s.execute("CREATE INDEX tgj ON tb_p2pinfo_gj(tgj)");
+		s.execute("CREATE INDEX distgj ON tb_p2pinfo_gj(dist)");
 		
 		sql = "CREATE CACHED TABLE tb_p2pinfo_zj (" +
 			"p1x INTEGER, p1y INTEGER, p2x INTEGER, p2y INTEGER," +
@@ -169,9 +186,9 @@ public class P2PInfoMgr {
 			"PRIMARY KEY(p1x,p1y,p2x,p2y)" +
 			")";
 		s.execute(sql);
-		s.execute("CREATE INDEX dist ON tb_p2pinfo_zj(zgj)");
-		s.execute("CREATE INDEX dist ON tb_p2pinfo_zj(zgj)");
-		s.execute("CREATE INDEX dist ON tb_p2pinfo_zj(dist)");
+		s.execute("CREATE INDEX dzj ON tb_p2pinfo_zj(dzj)");
+		s.execute("CREATE INDEX tzj ON tb_p2pinfo_zj(tzj)");
+		s.execute("CREATE INDEX distzj ON tb_p2pinfo_zj(dist)");
 		
 		sql = "CREATE CACHED TABLE tb_p2pinfo_dist (" +
 			"p1x INTEGER, p1y INTEGER, p2x INTEGER, p2y INTEGER," +
@@ -269,7 +286,7 @@ public class P2PInfoMgr {
 		int times = 4;
 		do {
 			try {
-				Connection cn = DriverManager.getConnection("jdbc:hsqldb:file:"+AllTgMgr.DBDIR+File.separator+posDBId+"."+city+(create?"":";ifexist=true"), "SA", "");
+				Connection cn = DriverManager.getConnection("jdbc:hsqldb:file:"+getPosDBID(city)+(create?"":";ifexist=true"), "SA", "");
 				return cn;
 			} catch (Exception e) {
 				try {
@@ -287,6 +304,4 @@ public class P2PInfoMgr {
 	private volatile int cpool_size = 0;
 	private volatile int cpool_max_size = 100;
 	private Map<String,Boolean> initCity = new HashMap<String,Boolean>();
-	
-	private String posDBId = "pos";
 }

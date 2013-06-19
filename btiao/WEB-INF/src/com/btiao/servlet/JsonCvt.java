@@ -2,6 +2,8 @@ package com.btiao.servlet;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.Map;
 
 import com.btiao.tg.TgData;
 
@@ -12,10 +14,10 @@ public class JsonCvt {
 		tg.url = "http://ffda&fda";
 		
 		StringBuilder sb = new StringBuilder();
-		System.out.println(obj(tg,sb));
+		System.out.println(obj(tg,sb, null));
 	}
 	
-	static public StringBuilder obj(Object o, StringBuilder sb) {
+	static public StringBuilder obj(Object o, StringBuilder sb, Map<String,Boolean> maskAttr) {
 		sb.append("{");
 		Class<?> oClass = o.getClass();
 		Field[] fields = oClass.getDeclaredFields();
@@ -23,6 +25,10 @@ public class JsonCvt {
 			int mdfIdx = f.getModifiers();
 			if (Modifier.isPublic(mdfIdx) && !Modifier.isStatic(mdfIdx)) {
 				String name = f.getName();
+				if (maskAttr != null && !maskAttr.containsKey(name)) {
+					continue;
+				}
+				
 				Object v = null;
 				try {
 					v = f.get(o);

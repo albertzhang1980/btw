@@ -1,3 +1,4 @@
+var btGlobal = {};
 (function(){
 //namespace registor
 
@@ -10,13 +11,22 @@ function refreshPos() {
 		var cityName = $("#curCity");
 		cityName.empty();
 		cityName.append(remote_ip_info.city);
+		
+		if (remote_ip_info.city == "北京") {
+			btGlobal.curTgCity = "beijing";
+		}		
 	});
 }
 
 function refreshTg() {
 	$("#idTgList").empty();
 	
-	var url = "../GetTgs?handle=0&pgs=10&idx=0";
+	if (!btGlobal.curTgCity || btGlobal.curTgCity == "") {
+		setTimeout(refreshTg, 200);
+		return;
+	}
+	
+	var url = "../GetTgs?handle=0&pgs=10&idx=0&city="+btGlobal.curTgCity;
 	$.getScript(url, function() {
 		var result = rst.result;
 		if (result != 0) {
@@ -38,10 +48,11 @@ function genTgHtml(tg) {
 	r += '"><img class="ctgImg" src="';
 	r += tg.imageUrl;
 	r += '"/></a>';
-	r += '<p class="ctgTitle"><a target="_blank" href="';
+	r += '<p class="ctgTitle" title="'+tg.title+'"><a target="_blank" href="';
 	r += tg.url;
 	r += '">';
-	r += tg.title;
+	var endIdx = tg.title.length > 60 ? 60 : tg.title.length;
+	r += tg.title.substring(0, endIdx);
 	r += '</a></p>';
 	r += '<div class="cPriceLine"><p>';
 	r += '<span class="cMoneySign">¥</span>';
