@@ -39,7 +39,14 @@ function add() {
 	<button onclick="closeDB(city);">closedb</button>
 	<!--东经度：116.7，西经度：116.1，北纬度：40.25，南纬度：39.65 -->
 	<!--东经度：116.6，西经度：116.25，北纬度：40.15，南纬度：39.8 -->
-	<button onclick="city='beijingc';genAll(city,{x:116.25,y:39.8},500, {x:116.6,y:40.15});">getallcore</button>
+	<br/>
+	<button onclick="city='beijing';genAll(city,{x:116.25,y:39.8},500, {x:116.6,y:40.15},0,10);">get-1</button>
+	<button onclick="city='beijing';genAll(city,{x:116.25,y:39.8},500, {x:116.6,y:40.15},10,20);">get-2</button>
+	<button onclick="city='beijing';genAll(city,{x:116.25,y:39.8},500, {x:116.6,y:40.15},20,30);">get-3</button>
+	<button onclick="city='beijing';genAll(city,{x:116.25,y:39.8},500, {x:116.6,y:40.15},30,40);">get-4</button>
+	<button onclick="city='beijing';genAll(city,{x:116.25,y:39.8},500, {x:116.6,y:40.15},40,50);">get-5</button>
+	<button onclick="city='beijing';genAll(city,{x:116.25,y:39.8},500, {x:116.6,y:40.15},50,60);">get-6</button>
+	<br/>
 	<button onclick="city='beijingcc';genAll(city,{x:116.28,y:39.8},500, {x:116.55,y:40.07});">getallcc</button>
 	<button onclick="city='beijing2';genAll(city, p1, 500, 10);">getall2</button>
 	<button onclick="clearInc();">clearInc</button>

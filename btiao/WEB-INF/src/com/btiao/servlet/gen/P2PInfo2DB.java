@@ -36,6 +36,8 @@ public class P2PInfo2DB extends HttpServlet {
 			String[] splitP2y = args.get("p2y")[0].split(",");
 			String[] splitDist = args.get("dist")[0].split(",");
 
+			P2PInfoMgr.instance().toDBInit(city);
+			
 			for (int i=0; i<splitP1x.length; ++i) {
 				int p1x = Integer.parseInt(splitP1x[i]);
 				int p1y = Integer.parseInt(splitP1y[i]);
@@ -58,7 +60,7 @@ public class P2PInfo2DB extends HttpServlet {
 					int dist_zj = (int)Float.parseFloat(splitZJ[i]);
 					rOne = P2PInfoMgr.instance().toDBZJ(city,p1x,p1y,p2x,p2y,dist_zj, time, dist);
 				} else {
-					rOne = P2PInfoMgr.instance().toDBDist(city,p1x,p1y,p2x,p2y,dist);
+					rOne = P2PInfoMgr.instance().toDBDist(p1x,p1y,p2x,p2y,dist);
 				}
 				
 				r = rOne ? r : false;
@@ -66,8 +68,11 @@ public class P2PInfo2DB extends HttpServlet {
 					break;
 				}
 			}
+			
+			P2PInfoMgr.instance().toDBCommit(city);
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.err.println(args);
 			r = false;
 		}
 		return r;
@@ -103,7 +108,24 @@ public class P2PInfo2DB extends HttpServlet {
 				int num = Integer.parseInt(multi[0]);
 				process_num += num;
 				
+//				class My extends Thread {
+//					public Map<String,String[]> args;
+//					P2PInfo2DB pobj;
+//					public void run() {
+//						pobj.procMulti(args);
+//					}
+//				}
+//				My my = new My();
+//				my.args = args;
+//				my.pobj = this;
+//				my.start();
+//				
+//				result = true;
+				long t1 = System.currentTimeMillis();
 				result = procMulti(args);
+				long t2 = System.currentTimeMillis();
+				System.out.println("t2-t1="+(t2-t1));
+				
 				rsp(res, result);
 				return;
 			}
@@ -130,7 +152,7 @@ public class P2PInfo2DB extends HttpServlet {
 				int tzj = (int)Float.parseFloat(args.get("time_zj")[0]);
 				P2PInfoMgr.instance().toDBZJ(city, p1x,p1y,p2x,p2y, dzj, tzj, dist);
 			} else {
-				P2PInfoMgr.instance().toDBDist(city, p1x,p1y,p2x,p2y, dist);
+				P2PInfoMgr.instance().toDBDist(p1x,p1y,p2x,p2y, dist);
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();

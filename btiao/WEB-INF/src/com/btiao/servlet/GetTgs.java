@@ -25,7 +25,7 @@ public class GetTgs extends HttpServlet {
 
 	/**
 	 * 输入：
-	 * handle=123&pgs=123;
+	 * idx=123&pgs=123;
 	 * 返回格式
 	 * {result=123;desc="";more:true/false; tgs:[{tgObj}];}
 	 */

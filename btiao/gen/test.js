@@ -67,20 +67,37 @@ var city = "beijing";
 
 	var INTERVAL = 1000;
 	var INTERVAL_NUM = 5000;
-	var INTERVAL_FAILED = 5000;
 	var PER_NUM = 100;
 	
-function genAll(city, p, step, pp) {
+function genAll(city, p, stepDist, pp, startNumX, endNumX) {
 	printGeo(p.x, p.y, "start");
 	printGeo(pp.x, pp.y, "end");
 	
-	var numX = (pp.x - p.x)/(step/lonDist); numX = parseInt(numX) + 1;
-	var numY = (pp.y - p.y)/(step/latDist); numY = parseInt(numY) + 1;
+	var stepX = stepDist/lonDist;
+	stepX = (parseInt(stepX*1000*1000))/(1000*1000);
+	var stepY = stepDist/latDist;
+	stepY = (parseInt(stepY*1000*1000))/(1000*1000);
 	
-	var pp2 = judgeNm(p, step*numX, step*numY);
+	var numX = (pp.x - p.x)/stepX; numX = parseInt(numX) + 1;
+	var numY = (pp.y - p.y)/stepY; numY = parseInt(numY) + 1;
+	
+	if (!startNumX) {
+		startNumX = 0;
+	}
+	if (!endNumX) {
+		endNumX = numX;
+	}
+	
+	city = city + "," + p.x + "," + p.y + "," + stepX + "," + stepY + "," + 
+		numX + "," + numY + "," + startNumX + "," + endNumX;
+	window.city = city;
+	
+	$("#txtoutdetail").append("stepX="+stepX+",stepY="+stepY+",numX="+numX+",numY="+numY+",startX="+startNumX+",endX="+endNumX+"<br/>");
+	
+	var pp2 = {x:(p.x + stepX*numX), y:(p.y + stepY*numY)};
 	printGeo(pp2.x, pp2.y, "end2");
 	
-	var total = numX*numY*(numX*numY-1); total = parseInt(total);
+	var total = (numX*numY-1)*(endNumX-startNumX)*numY; //numX*numY*(numX*numY-1);
 	
 	var tm_begin = new Date().getTime();
 	var tm_start = new Date().getTime();
@@ -97,16 +114,25 @@ function genAll(city, p, step, pp) {
 	genAll.okGJNumLast = 0;
 	genAll.okZJNumLast = 0;
 	genAll.okDistOnlyNumLast = 0;
+	genAll.okGJBDNum = 0;
+	genAll.okZJBDNum = 0;
+	genAll.okDistOnlyBDNum = 0;
 	
 	initDB(city);
-		
+	
+	iFirst = startNumX;
+	
 	var nextIJFirst = function () {
+		if (iFirst >= endNumX) {
+			return false;
+		}
+		
 		++jFirst;
-		if (jFirst>=numX) {
+		if (jFirst>=numY) {
 			jFirst = 0;
 			++iFirst;
 			
-			if (iFirst>=numX) {
+			if (iFirst>=endNumX) {
 				return false;
 			} else {
 				return true;
@@ -114,13 +140,27 @@ function genAll(city, p, step, pp) {
 		}
 		return true;
 	}
+	var canUseIJFirst = function() {
+		if (iFirst < startNumX || iFirst >= endNumX || jFirst >= numY) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	var canUseIJSecond = function() {
+		if (iSecond >= numX || jSecond >= numY) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 	var nextIJSecond = function () {
 		++jSecond;
 		if (jSecond>=numY) {
 			jSecond = 0;
 			++iSecond;
 			
-			if (iSecond>=numY) {
+			if (iSecond>=numX) {
 				return false;
 			} else {
 				return true;
@@ -134,74 +174,74 @@ function genAll(city, p, step, pp) {
 		var exeNum = 0;
 		
 		var firstIsLeggal = true;
-		do {
-			var secondIsLeggal = true;
-			do {
-				p1 = judgeNm(p, iFirst*step, jFirst*step);
-				p2 = judgeNm(p, iSecond*step, jSecond*step);
-				
-				if (!(p1.x == p2.x && p1.y == p2.y)) {
-					//getDistZJ(city, p1, p2);
-					//getDistGJ(city, p1, p2);
-					getDistOnly(city, p1, p2);
-				}
-				
-				++exeNum;
-				secondIsLeggal = nextIJSecond();
-				if (exeNum>=INTERVAL_NUM || !secondIsLeggal) break;
-			} while (true);
+		while ((firstIsLeggal=canUseIJFirst()) && exeNum<INTERVAL_NUM) {
+			p1 = {x:(p.x+iFirst*stepX), y:(p.y+jFirst*stepY)};
+			p2 = {x:(p.x+iSecond*stepX), y:(p.y+jSecond*stepY)};
 			
+			if (!(p1.x == p2.x && p1.y == p2.y)) {
+				//getDistZJ(city, p1, p2);
+				//getDistGJ(city, p1, p2);
+				getDistOnly(city, p1, p2);
+				++exeNum;
+			}
+			
+			//next p1 & p2
+			secondIsLeggal = nextIJSecond();
 			if (!secondIsLeggal) {
 				iSecond = 0;
 				jSecond = 0;
+				
 				firstIsLeggal = nextIJFirst();
 			}
-				
-			if (exeNum>=INTERVAL_NUM || !firstIsLeggal) {
-				break;
-			}
-		} while (true);
+		}
 
-		if (firstIsLeggal) {
-			setTimeout(arguments.callee, INTERVAL);
-			
-			tm_end = new Date().getTime();
-			var time = (tm_end-tm_start)/1000;
-			var useTime = (tm_end-tm_begin)/1000;
-
-			var eclipseNumGJ = total - genAll.okGJNum;
-			var eclipseNumZJ = total - genAll.okZJNum;
-			var eclipseNumDist = total - genAll.okDistOnlyNum;
-			
-			var spGJ = (genAll.okGJNum-genAll.okGJNumLast)/time; spGJ = parseInt(spGJ);
-			var spZJ = (genAll.okZJNum-genAll.okZJNumLast)/time; spZJ = parseInt(spZJ);
-			var spDist = (genAll.okDistOnlyNum-genAll.okDistOnlyNumLast)/time; spDist = parseInt(spDist);
-			
-			var hGJ = (eclipseNumGJ)/(spGJ*3600); hGJ = parseInt(hGJ);
-			var mGJ = ((eclipseNumGJ)/(spGJ*60))%60; mGJ = parseInt(mGJ);
-			var sGJ = ((eclipseNumGJ)/spGJ)%60; sGJ = parseInt(sGJ);
-			
-			var hZJ = (eclipseNumZJ)/(spZJ*3600); hZJ = parseInt(hZJ);
-			var mZJ = ((eclipseNumZJ)/(spZJ*60))%60; mZJ = parseInt(mZJ);
-			var sZJ = ((eclipseNumZJ)/spZJ)%60; sZJ = parseInt(sZJ);
-			
-			var hDist = (eclipseNumDist)/(spDist*3600); hDist = parseInt(hDist);
-			var mDist = ((eclipseNumDist)/(spDist*60))%60; mDist = parseInt(mDist);
-			var sDist = ((eclipseNumDist)/spDist)%60; sDist = parseInt(sDist);
-			
-			$("#genAllProcess").empty();
-			$("#genAllProcess").append("<p>total: "+total+",已使用时间: "+parseInt(useTime/3600)+"小时,"+parseInt(useTime/60)%60+"分钟,"+parseInt(useTime)%60+"秒"+"</p>");
-			$("#genAllProcess").append("<p>finished_gj: "+genAll.okGJNum+","+genAll.okGJBDNum+",速度_gj: "+spGJ+",剩余时间: "+hGJ+"小时,"+mGJ+"分钟,"+sGJ+"秒"+"</p>");
-			$("#genAllProcess").append("<p>finished_zj: "+genAll.okZJNum+","+genAll.okZJBDNum+",速度_zj: "+spZJ+",剩余时间: "+hZJ+"小时,"+mZJ+"分钟,"+sZJ+"秒"+"</p>");
-			$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",速度_dist: "+spDist+",剩余时间: "+hDist+"小时,"+mDist+"分钟,"+sDist+"秒"+"</p>");
-		} else {
+		if (!firstIsLeggal) {
 			flushcache();
 		}
 		
-		tm_start = new Date().getTime();
-		genAll.okGJNumLast = genAll.okGJNum;
-		genAll.okZJNumLast = genAll.okZJNum;
-		genAll.okDistOnlyNumLast = genAll.okDistOnlyNum;
+		tm_end = new Date().getTime();
+		var time = (tm_end-tm_start)/1000;
+		var useTime = (tm_end-tm_begin)/1000;
+
+		var eclipseNumGJ = total - genAll.okGJNum;
+		var eclipseNumZJ = total - genAll.okZJNum;
+		var eclipseNumDist = total - genAll.okDistOnlyNum;
+		
+		var spGJ = (genAll.okGJNum-genAll.okGJNumLast)/time; spGJ = parseInt(spGJ);
+		var spZJ = (genAll.okZJNum-genAll.okZJNumLast)/time; spZJ = parseInt(spZJ);
+		var spDist = (genAll.okDistOnlyNum-genAll.okDistOnlyNumLast)/time; spDist = parseInt(spDist);
+		
+		var hGJ = (eclipseNumGJ)/(spGJ*3600); hGJ = parseInt(hGJ);
+		var mGJ = ((eclipseNumGJ)/(spGJ*60))%60; mGJ = parseInt(mGJ);
+		var sGJ = ((eclipseNumGJ)/spGJ)%60; sGJ = parseInt(sGJ);
+		
+		var hZJ = (eclipseNumZJ)/(spZJ*3600); hZJ = parseInt(hZJ);
+		var mZJ = ((eclipseNumZJ)/(spZJ*60))%60; mZJ = parseInt(mZJ);
+		var sZJ = ((eclipseNumZJ)/spZJ)%60; sZJ = parseInt(sZJ);
+		
+		var hDist = (eclipseNumDist)/(spDist*3600); hDist = parseInt(hDist);
+		var mDist = ((eclipseNumDist)/(spDist*60))%60; mDist = parseInt(mDist);
+		var sDist = ((eclipseNumDist)/spDist)%60; sDist = parseInt(sDist);
+		
+		$("#genAllProcess").empty();
+		$("#genAllProcess").append("<p>total: "+total+",已使用时间: "+parseInt(useTime/3600)+"小时,"+parseInt(useTime/60)%60+"分钟,"+parseInt(useTime)%60+"秒"+"</p>");
+		$("#genAllProcess").append("<p>finished_gj: "+genAll.okGJNum+","+genAll.okGJBDNum+",速度_gj: "+spGJ+",剩余时间: "+hGJ+"小时,"+mGJ+"分钟,"+sGJ+"秒"+"</p>");
+		$("#genAllProcess").append("<p>finished_zj: "+genAll.okZJNum+","+genAll.okZJBDNum+",速度_zj: "+spZJ+",剩余时间: "+hZJ+"小时,"+mZJ+"分钟,"+sZJ+"秒"+"</p>");
+		$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",速度_dist: "+spDist+",剩余时间: "+hDist+"小时,"+mDist+"分钟,"+sDist+"秒"+"</p>");
+		
+		if (genAll.okDistOnlyNumLast != genAll.okDistOnlyNum) {
+			tm_start = new Date().getTime();
+			genAll.okGJNumLast = genAll.okGJNum;
+			genAll.okZJNumLast = genAll.okZJNum;
+			genAll.okDistOnlyNumLast = genAll.okDistOnlyNum;
+		}
+		
+		if (genAll.okDistOnlyNum == total) {
+			$("#genAllProcess").append("<p>success!!!");
+		} else {
+			flushFailCache();
+			setTimeout(arguments.callee, INTERVAL);
+		}
 	}, 0);
 }
 function push2cache(o) {
@@ -226,6 +266,8 @@ function flushFailCache() {
 	}
 }
 function flushcache() {
+	if (!sendDist.cache) return;
+	
 	var cache = sendDist.cache;
 	sendDist.cache = [];
 
@@ -285,6 +327,7 @@ function sendDist(d) {
 			}
 		} else {
 			if (!sendDist.blockCache) {
+				$("#txtoutdetail").append("error!");
 				sendDist.blockCache = [];
 			}
 			sendDist.blockCache.push(d);

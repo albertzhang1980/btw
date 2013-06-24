@@ -46,82 +46,65 @@ public class P2PInfoMgr {
 	}
 	
 	public boolean toDBGJ(String city, int p1x, int p1y, int p2x, int p2y, int dgj, int tgj, int dist) {
-		Connection cn = null;
+		Connection cn = thCn.get();
 		try {
-			cn = getCon(city, false);
 			Statement s = cn.createStatement();
 			insertGJ(s, p1x,p1y,p2x,p2y, dgj, tgj, dist);
-			cn.commit();
 			s.close();
-			cn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		} finally {
-			if (cn != null) {
-				try {
-					cn.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		return true;
 	}
 	public boolean toDBZJ(String city, int p1x, int p1y, int p2x, int p2y, int dzj, int tzj, int dist) {
-		Connection cn = null;
+		Connection cn = thCn.get();
 		try {
-			cn = getCon(city, false);
 			Statement s = cn.createStatement();
 			insertZJ(s, p1x,p1y,p2x,p2y, dzj, tzj, dist);
-			cn.commit();
 			s.close();
-			cn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		} finally {
-			if (cn != null) {
-				try {
-					cn.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		return true;
 	}
-	public boolean toDBDist(String city, int p1x, int p1y, int p2x, int p2y, int dist) {
-		Connection cn = null;
+	public void toDBInit(String city) {
+		try {
+			Connection cn = getCon(city, false);
+			thCn.set(cn);
+			cn.setAutoCommit(false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public void toDBCommit(String city) {
+		try {
+			Connection cn = (Connection)thCn.get();
+			thCn.remove();
+			cn.commit();
+			relCon(city, cn);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public boolean toDBDist(int p1x, int p1y, int p2x, int p2y, int dist) {
+		Connection cn = thCn.get();
 		Statement s = null;
 		try {
-			cn = getCon(city, false);
 			s = cn.createStatement();
 			insertDist(s, p1x,p1y,p2x,p2y, dist);
-			cn.commit();
 			s.close();
-			cn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		} finally {
-			if (s != null) {
-				try {
-					s.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			if (cn != null) {
-				relCon(city, cn);
-			}
 		}
 		return true;
 	}
 	public synchronized void closeDB(String city) throws Exception {
 		try {
 			Connection cn = getCon(city, false);
-			cn.createStatement().execute("SHUTDOWN COMPACT");// IMMEDIATELY");
+			cn.createStatement().execute("SHUTDOWN");// IMMEDIATELY");
 			cn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -147,14 +130,16 @@ public class P2PInfoMgr {
 			try {
 				cn = getCon(city, true);
 				Statement s = cn.createStatement();
-				s.execute("SET FILES LOG FALSE"); //
+				s.execute("SET FILES LOG FALSE");
+				s.execute("SET FILES WRITE DELAY 6");
+				s.execute("SET FILES BACKUP INCREMENT FALSE");
 				createTB(s);
 				cn.commit();
 				s.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				cn.close();
+				if (cn != null) relCon(city, cn);
 			}
 			
 			initCity.put(city, true);
@@ -302,6 +287,8 @@ public class P2PInfoMgr {
 	private Map<String,Map<Connection,String>> cpool =
 			new HashMap<String,Map<Connection,String>>();
 	private volatile int cpool_size = 0;
-	private volatile int cpool_max_size = 100;
+	private volatile int cpool_max_size = 7;
 	private Map<String,Boolean> initCity = new HashMap<String,Boolean>();
+	
+	private ThreadLocal<Connection> thCn = new ThreadLocal<Connection>();
 }
