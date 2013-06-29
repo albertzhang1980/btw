@@ -13,8 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.btiao.Result;
 import com.btiao.domain.BTiaoExp;
+import com.btiao.domain.UserFilter;
 import com.btiao.service.AllTgMgr;
-import com.btiao.service.UserFilter;
 import com.btiao.tg.TgData;
 
 public class GetTgs extends HttpServlet {
@@ -85,7 +85,8 @@ public class GetTgs extends HttpServlet {
 	}
 	
 	private void outErr(PrintWriter out, int errNo) {
-		out.print("var rst = {result:"+errNo+",desc:\""+Result.desc(errNo));
+		String str = "var rst = {result:"+errNo+",desc:\""+Result.desc(errNo)+"\"}";
+		out.print(str);
 	}
 	
 	private int getIntArg(Map<String,String[]> args, String name) throws BTiaoExp {
@@ -120,8 +121,8 @@ public class GetTgs extends HttpServlet {
 	
 	private void setUserFilter(Map<String,String[]> args, UserFilter f) throws BTiaoExp {
 		String city = "";
-		long uLongitude = -1;
-		long uLatitude = -1;
+		int uLongitude = -1;
+		int uLatitude = -1;
 				
 		String[] filterArg = args.get("flt");
 		if (filterArg != null && filterArg.length > 0) {
@@ -135,12 +136,12 @@ public class GetTgs extends HttpServlet {
 		}
 		
 		city = getStrArg(args, "city");
-		uLongitude = getLongArg(args, "uLon");
-		uLatitude = getLongArg(args, "uLat");
+		uLongitude = getIntArg(args, "uLon");
+		uLatitude = getIntArg(args, "uLat");
 		
 		f.city = city;
-		f.uLatitude = uLatitude;
-		f.uLongitude = uLongitude;
+		f.uLat = uLatitude;
+		f.uLon = uLongitude;
 	}
 	
 	private String getStrArg(Map<String,String[]> args, String name) throws BTiaoExp {

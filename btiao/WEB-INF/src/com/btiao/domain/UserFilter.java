@@ -1,4 +1,4 @@
-package com.btiao.service;
+package com.btiao.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,15 +130,15 @@ public class UserFilter {
 		StringBuilder sb = new StringBuilder();
 		sb.append("{");
 		sb.append("city="+city);
-		sb.append(";lon="+uLongitude);
-		sb.append(";lat="+uLatitude);
+		sb.append(",lon="+uLon);
+		sb.append(",lat="+uLat);
 		
 		sb.append("{");
 		for (List<Item> f : fs) {
 			sb.append("{");
 			for (Item it : f) {
 				sb.append(it.toString());
-				sb.append(";");
+				sb.append(",");
 			}
 			sb.append("},");
 		}
@@ -151,6 +151,6 @@ public class UserFilter {
 	public List<List<Item>> fs = new ArrayList<List<Item>>();
 	
 	public String city;
-	public long uLongitude = -1;
-	public long uLatitude = -1;
+	public int uLon = -1;
+	public int uLat = -1;
 }

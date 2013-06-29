@@ -1,17 +1,22 @@
 package com.btiao.domain;
 
 public class BTiaoExp extends Exception {
-	public BTiaoExp(int errNo, Throwable be) {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5694149100044209600L;
+
+	public BTiaoExp(int errNo, Throwable src) {
 		this.errNo = errNo;
-		this.be = be;
+		this.src = src;
 	}
 	
 	@Override
 	public String toString() {
-		return "errNo=" + errNo + "\n" + be;
+		return "errNo=" + errNo + "\n" + src;
 	}
 	
 	public final int errNo;
 	
-	public final Throwable be;
+	public final Throwable src;
 }

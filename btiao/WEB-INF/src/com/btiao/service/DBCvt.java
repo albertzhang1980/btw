@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Map;
 
 import com.btiao.tg.TgData;
 
@@ -20,7 +21,7 @@ public class DBCvt {
 		ResultSet rst = s.executeQuery(sql);
 		while (rst.next()) {
 			TgData tg = new TgData();
-			row2obj(rst, tg);
+			row2obj(rst, tg, null);
 		}
 		
 		s.close();
@@ -28,11 +29,23 @@ public class DBCvt {
 		
 	}
 	
-	static public void row2obj(ResultSet rst, Object o) throws Exception {
+	/**
+	 * 将db返回数据映射到对象属性
+	 * @param rst
+	 * @param o
+	 * @param maskAttr 存在mask中的属性将会被屏蔽，不处理
+	 * @throws Exception
+	 */
+	static public void row2obj(ResultSet rst, Object o, Map<String,Boolean> maskAttr) throws Exception {
 		Class<?> oClass = o.getClass();
 		Field[] fields = oClass.getDeclaredFields();
 		for (Field f : fields) {
 			String col = f.getName();
+			
+			if (maskAttr != null && maskAttr.containsKey(col)) {
+				continue;
+			}
+			
 			String v = rst.getString(col);
 			
 			Class<?> clz = f.getType();

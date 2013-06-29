@@ -14,7 +14,7 @@ function refreshPos() {
 		
 		if (remote_ip_info.city == "北京") {
 			btGlobal.curTgCity = "beijing";
-		}		
+		}
 	});
 }
 
