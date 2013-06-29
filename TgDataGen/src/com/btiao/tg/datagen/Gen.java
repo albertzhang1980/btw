@@ -79,6 +79,7 @@ public abstract class Gen {
 					"type INTEGER NOT NULL," +
 					"longitude BIGINT NOT NULL," +
 					"latitude BIGINT NOT NULL," +
+					"dist INTEGER NOT NULL," +
 					"url VARCHAR(256) NOT NULL," +
 					"title VARCHAR(512) NOT NULL," +
 					"desc VARCHAR(512) NOT NULL," +
@@ -281,10 +282,11 @@ public abstract class Gen {
 	private String genInsertTgSql(TgData tg, TgShop shop) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("INSERT INTO tb_tg ");
-		sb.append("(type,longitude,latitude,url,title,desc,imageUrl,startTime,endTime,useEndTime,value,price,boughtNum) VALUES(");
+		sb.append("(type,longitude,latitude,dist,url,title,desc,imageUrl,startTime,endTime,useEndTime,value,price,boughtNum) VALUES(");
 		sb.append(tg.type);sb.append(",");
 		sb.append(shop.longitude);sb.append(",");
 		sb.append(shop.latitude);sb.append(",");
+		sb.append("0");sb.append(",");
 		sb.append(normalTxt2Sqltxt(tg.url));sb.append(",");
 		sb.append(normalTxt2Sqltxt(tg.title));sb.append(",");
 		if (tg.desc.length() > 120) {

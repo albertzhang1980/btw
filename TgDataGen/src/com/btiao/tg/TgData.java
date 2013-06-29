@@ -47,8 +47,8 @@ public class TgData {
 	
 	public String url;
 	
-	public long longitude;
-	public long latitude;
+	public int longitude;
+	public int latitude;
 	
 	public String title;
 	public String desc;
