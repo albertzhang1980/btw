@@ -9,7 +9,7 @@ public class TgData {
 		static public final int food = 1; //美食 [1,10000)
 		static public final int food_huoguo = 1000; //美食-火锅
 		static public final int food_kaoyu = 1001; //美食-烤鱼
-		static public final int food_kaorou = 1002; //美食-烤肉
+		static public final int food_kaorou = 1002; //美食-烤肉 
 		static public final int food_mlxg = 1003; //美食-麻辣香锅
 		static public final int food_xican = 1004; //美食-西餐
 		static public final int food_taicai = 1005; //美食-泰菜
@@ -74,5 +74,5 @@ public class TgData {
 //	public String nameOfOrigWebSite;
 //	public String urlOfOrigWebSite;
 	
-	public int dist = 0; //距离
+	public int dist = -1; //距离，-1表示未知
 }
