@@ -67,6 +67,7 @@ public class GetTgs extends HttpServlet {
 				maskAttr.put("title", true);
 				maskAttr.put("price", true);
 				maskAttr.put("value", true);
+				maskAttr.put("dist", true);
 				
 				JsonCvt.obj(tgs.get(0), sb, maskAttr);
 				for (int i=1; i<num; ++i) {

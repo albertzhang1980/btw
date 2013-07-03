@@ -103,10 +103,12 @@ public class AllTgMgr {
 	{
 		boolean inRange = PosDBMgr.instance().judgeUserPos(f);
 		
-		Boolean dbExist = fltdb.get(f.toString());
-		if (dbExist == null || !dbExist) {
-			genFilterDB(f);
-			fltdb.put(f.toString(), true);
+		if (inRange) {
+			Boolean dbExist = fltdb.get(f.toString());
+			if (dbExist == null || !((boolean)dbExist)) {
+				genFilterDB(f);
+				fltdb.put(f.toString(), true);
+			}
 		}
 		
 		List<TgData> r = getTgBlockData(inRange, f, idx, num);
@@ -122,13 +124,13 @@ public class AllTgMgr {
 		
 		try {
 			Connection cn = null;
-			
+			String options = ";readonly=true";
 			if (inRange) {
 				String dbId= genTgFilterDBOnlyFile(f, false);
-				cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBFDIR+File.separator+dbId, "SA", "");
+				cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBFDIR+File.separator+dbId+options, "SA", "");
 			} else {
 				String dbId = getTgDBID(f.city);
-				cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+dbId, "SA", "");
+				cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBDIR+File.separator+dbId+options, "SA", "");
 			}
 			
 			Statement s = cn.createStatement();
@@ -143,7 +145,7 @@ public class AllTgMgr {
 					continue;
 				}
 				
-				if (num < 0) break;
+				if (num <= 0) break;
 				
 				TgData tg = new TgData();
 				DBCvt.row2obj(rst, tg, null);
@@ -171,7 +173,7 @@ public class AllTgMgr {
 
 		Connection cn = null;
 		try {
-			cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBFDIR+File.separator+dbId+";ifexist=true", "SA", "");
+			cn = DriverManager.getConnection("jdbc:hsqldb:file:"+DBFDIR+File.separator+dbId+";ifexist=true;shutdown=true", "SA", "");
 			
 			genTgDynamicData(cn, f);
 		} catch (Exception e) {
@@ -202,6 +204,7 @@ public class AllTgMgr {
 				Map<String,Boolean> mask = new HashMap<String,Boolean>();
 				//mask.put("dist", null);
 				DBCvt.row2obj(rst, tg, mask);
+				tg.dist = -1;
 				tgs.add(tg);
 			}
 		} catch (Exception e) {
@@ -221,9 +224,15 @@ public class AllTgMgr {
 				ResultSet rst = s.executeQuery(sql);
 				if (rst.next()) {
 					tg.dist = rst.getInt("dist");
-					sql = "update tb_tg SET dist = " + tg.dist;
-					us.execute(sql);
-				}
+					
+					sql = "update tb_tg SET dist = " + tg.dist +
+							" WHERE LONGITUDE=" + tg.longitude +
+							" AND LATITUDE=" + tg.latitude;
+					int r = us.executeUpdate(sql);
+					if (r < 1) {
+						System.err.println("update failed! sql="+sql);
+					}
+				}			
 			}
 			
 			cn.commit();
@@ -260,10 +269,10 @@ public class AllTgMgr {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(" WHERE " +
-				"p1x=" + tmp.uLon + " AND " +
-				"p1y=" + tmp.uLat + " AND " +
-				"p2x=" + f.uLon + " AND " +
-				"p2y=" + f.uLat);
+				"p1x=" + f.uLon + " AND " +
+				"p1y=" + f.uLat + " AND " +
+				"p2x=" + tmp.uLon + " AND " +
+				"p2y=" + tmp.uLat);
 		return sb.toString();
 	}
 	
@@ -321,8 +330,16 @@ public class AllTgMgr {
 				for (Process p : ps) {
 					int specialErr = p.waitFor();
 					if (err == 0 && specialErr != 0) {
-						System.out.print(p.getErrorStream().toString());
+						try {
+							int num = p.getErrorStream().available();
+							byte[] b = new byte[num];
+							p.getErrorStream().read(b);
+							System.out.print(new String(b));
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						err = specialErr;
+						break;
 					}
 				}
 				

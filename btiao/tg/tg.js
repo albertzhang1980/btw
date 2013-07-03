@@ -26,7 +26,11 @@ function refreshTg() {
 		return;
 	}
 	
-	var url = "../GetTgs?handle=0&pgs=10&idx=0&city="+btGlobal.curTgCity;
+	var uLon = 116255000;
+	var uLat = 39900000;
+	var url = "../GetTgs?handle=0&pgs=10&idx=0&city="+btGlobal.curTgCity+
+			"&uLon="+uLon+"&uLat="+uLat;
+	
 	$.getScript(url, function() {
 		var result = rst.result;
 		if (result != 0) {
@@ -42,6 +46,7 @@ function refreshTg() {
 	});
 }
 
+btGlobal.genTgHtml = genTgHtml;
 function genTgHtml(tg) {
 	var r = '<a target="_blank" href="';
 	r += tg.url;
@@ -65,7 +70,9 @@ function genTgHtml(tg) {
 	r += '&nbsp;&nbsp;</span>';
 	r += '</p><a class="cGo" target="_blank" href="';
 	r += tg.url;
-	r += '">去看看</a></div>'
+	r += '">去看看</a>';
+	r += '<p>'+tg.dist+'&nbsp;米</p>';
+	r += '</div>'
 		
 	return r;
 }

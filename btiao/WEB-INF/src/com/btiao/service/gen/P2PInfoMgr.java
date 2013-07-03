@@ -104,7 +104,7 @@ public class P2PInfoMgr {
 	public synchronized void closeDB(String city) throws Exception {
 		try {
 			Connection cn = getCon(city, false);
-			cn.createStatement().execute("SHUTDOWN");// IMMEDIATELY");
+			cn.createStatement().execute("SHUTDOWN IMMEDIATELY");
 			cn.close();
 		} catch (Exception e) {
 			e.printStackTrace();

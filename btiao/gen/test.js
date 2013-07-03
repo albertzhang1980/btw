@@ -66,17 +66,25 @@ var p2 = judgeNm(p1, 1*1000, 1*1000);
 var city = "beijing";
 
 	var INTERVAL = 1000;
-	var INTERVAL_NUM = 5000;
+	var INTERVAL_NUM = 2500;
 	var PER_NUM = 100;
 	
 function genAll(city, p, stepDist, pp, startNumX, endNumX) {
 	printGeo(p.x, p.y, "start");
 	printGeo(pp.x, pp.y, "end");
 	
+	p.x = parseInt(p.x*1000*1000);
+	p.y = parseInt(p.y*1000*1000);
+	
+	pp.x = parseInt(pp.x*1000*1000);
+	pp.y = parseInt(pp.y*1000*1000);
+	
 	var stepX = stepDist/lonDist;
-	stepX = (parseInt(stepX*1000*1000))/(1000*1000);
-	var stepY = stepDist/latDist;
-	stepY = (parseInt(stepY*1000*1000))/(1000*1000);
+	stepX = (parseInt(stepX*1000*1000))/(1000*1000); 
+	stepX=parseInt(stepX*1000*1000);
+	var stepY = stepDist/latDist; 
+	stepY = (parseInt(stepY*1000*1000))/(1000*1000); 
+	stepY=parseInt(stepY*1000*1000);
 	
 	var numX = (pp.x - p.x)/stepX; numX = parseInt(numX) + 1;
 	var numY = (pp.y - p.y)/stepY; numY = parseInt(numY) + 1;
@@ -335,18 +343,15 @@ function sendDist(d) {
 		d = null;
 	}});
 }
-function cvtP(p) {
-	var r = {x:parseInt(p.x*1000000),y:parseInt(p.y*1000000)};
-	return r;
-}
+
 function getDistOnly(city, p1, p2) {
-	var lineDist = gMap.getDistance(new BMap.Point(p1.x, p1.y),new BMap.Point(p2.x, p2.y));
+	var lineDist = gMap.getDistance(new BMap.Point(p1.x/(1000*1000), p1.y/(1000*1000)),new BMap.Point(p2.x/(1000*1000), p2.y/(1000*1000)));
 	lineDist = parseInt(lineDist);
 	var time = 0;
 	var totalDist = 0;
 	
-	var P1 = cvtP(p1);
-	var P2 = cvtP(p2);
+	var P1 = p1;
+	var P2 = p2;
 	
 	//genAll.okDistOnlyNum = genAll.okDistOnlyNum ? (genAll.okDistOnlyNum + 1) : 1;
 	//return;
@@ -365,8 +370,8 @@ function getDistZJ(city, p1, p2, disable) {
 				var totalDist = -1;//单位：米，-1表示未知
 				var lineDist = -1;//单位：米，-1表示未知
 				var time = -1;//单位：分钟，-1表示未知
-				var P1 = cvtP(p1);
-				var P2 = cvtP(p2);
+				var P1 = p1;
+				var P2 = p2;
 	
 				if (status == BMAP_STATUS_SUCCESS) {
 					var plan = results.getPlan(0);
@@ -386,7 +391,7 @@ function getDistZJ(city, p1, p2, disable) {
 					$("#txtoutdetail").append("<p>zjerr="+status+",p1.x="+p1.x+",p1.y="+p1.y+",p2.x="+p2.x+",p2.y="+p2.y+"</p>");
 				}
 				
-				lineDist = gMap.getDistance(new BMap.Point(p1.x, p1.y),new BMap.Point(p2.x, p2.y));
+				lineDist = gMap.getDistance(new BMap.Point(p1.x/(1000*1000), p1.y/(1000*1000)),new BMap.Point(p2.x/(1000*1000), p2.y/(1000*1000)));
 				lineDist = parseInt(lineDist);
 				
 				genAll.okZJBDNum = genAll.okZJBDNum ? (genAll.okZJBDNum + 1) : 1;
@@ -407,13 +412,13 @@ function getDistZJ(city, p1, p2, disable) {
 	
 	var driving = new BMap.DrivingRoute(gMap, options);
 	
-	driving.search(new BMap.Point(p1.x, p1.y), new BMap.Point(p2.x, p2.y));
+	driving.search(new BMap.Point(p1.x/(1000*1000), p1.y/(1000*1000)), new BMap.Point(p2.x, p2.y/(1000*1000)));
 }
 function getDistGJ(city, p1, p2, disable) {
-	var P1 = cvtP(p1);
-	var P2 = cvtP(p2);
+	var P1 = p1;
+	var P2 = p2;
 	
-	var transit = new BMap.TransitRoute(new BMap.Point(p1.x, p1.y), {
+	var transit = new BMap.TransitRoute(new BMap.Point(p1.x/(1000*1000), p1.y/(1000*1000)), {
 		policy: BMAP_TRANSIT_POLICY_LEAST_TIME
 	});
 	transit.setSearchCompleteCallback(function(results){
@@ -458,7 +463,7 @@ function getDistGJ(city, p1, p2, disable) {
 				$("#txtoutdetail").append("<p>gjerr="+status+",p1.x="+p1.x+",p1.y="+p1.y+",p2.x="+p2.x+",p2.y="+p2.y+"</p>");
 			}
 				
-			lineDist = gMap.getDistance(new BMap.Point(p1.x, p1.y),new BMap.Point(p2.x, p2.y));
+			lineDist = gMap.getDistance(new BMap.Point(p1.x/(1000*1000), p1.y/(1000*1000)),new BMap.Point(p2.x/(1000*1000), p2.y/(1000*1000)));
 			lineDist = parseInt(lineDist); //去掉小数位
 			
 			var P1 = cvtP(p1);
@@ -476,7 +481,7 @@ function getDistGJ(city, p1, p2, disable) {
 		}
 	});
 	
-	transit.search(new BMap.Point(p1.x, p1.y), new BMap.Point(p2.x, p2.y));
+	transit.search(new BMap.Point(p1.x/(1000*1000), p1.y/(1000*1000)), new BMap.Point(p2.x/(1000*1000), p2.y/(1000*1000)));
 }
 function failCB(p2pObj, zj, gj, dist) {
 	if (zj) {

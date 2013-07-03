@@ -23,7 +23,7 @@ function getTg() {
 		
 		for (var idx=0; idx<rst.tgs.length; ++idx) {
 			var tgHtml = '<li class="cTgLi"><div class="cTgUnit">';
-			tgHtml += genTgHtml(rst.tgs[idx]);
+			tgHtml += btGlobal.genTgHtml(rst.tgs[idx]);
 			tgHtml += '</div></li>';
 			$("#idTgList").append(tgHtml);
 		}
