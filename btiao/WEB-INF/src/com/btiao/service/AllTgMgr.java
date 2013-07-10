@@ -92,7 +92,9 @@ public class AllTgMgr {
 	static private volatile AllTgMgr inst = null;
 	
 	/**
-	 * 返回handle对应的团购序列的一页数据。
+	 * 返回handle对应的团购序列的一页数据。<br>
+	 * 若没有对应过滤条件缓存DB，则新建一个。<br>
+	 * 若有，则直接使用。<br>
 	 * @param f 过滤条件
 	 * @param idx 要获取的数据的起始索引
 	 * @param pgs 要获取的数据的个数
@@ -116,9 +118,36 @@ public class AllTgMgr {
 	}
 	
 	private AllTgMgr() {
+		initExistFilterDB();
+	}
+	
+	private void initExistFilterDB() {
+		File fdbdir = new File(DBFDIR);
+		if (!fdbdir.exists()) {
+			fdbdir.mkdir();
+			return;
+		}
+		
+		String[] dbfns = fdbdir.list();
+		for (String fn : dbfns) {
+			if (!fn.endsWith(".properties")) {
+				continue;
+			}
+			
+			String dbId = fn.substring(0, fn.length()-".properties".length());
+			String fstr = getFilterStrFromDBID(dbId);
+			fltdb.put(fstr, true);
+		}
 	}
 	
 	private List<TgData> getTgBlockData(boolean inRange, UserFilter f, int idx, int num) {
+		if (idx < 0) {
+			idx = 0;
+		}
+		if (num < 0) {
+			num = 0;
+		}
+		
 		List<TgData> tgs = new ArrayList<TgData>();
 		
 		
@@ -204,7 +233,6 @@ public class AllTgMgr {
 				Map<String,Boolean> mask = new HashMap<String,Boolean>();
 				//mask.put("dist", null);
 				DBCvt.row2obj(rst, tg, mask);
-				tg.dist = -1;
 				tgs.add(tg);
 			}
 		} catch (Exception e) {
@@ -231,6 +259,8 @@ public class AllTgMgr {
 					int r = us.executeUpdate(sql);
 					if (r < 1) {
 						System.err.println("update failed! sql="+sql);
+					} else {
+						cn.commit();
 					}
 				}			
 			}
@@ -276,8 +306,12 @@ public class AllTgMgr {
 		return sb.toString();
 	}
 	
+	private String getDBIDByFilter(UserFilter f) {
+		return "tg."+f.toString();
+	}
+	
 	private String genTgFilterDBOnlyFile(UserFilter f, boolean newDB) {
-		String dbId = "tg."+f.toString();
+		String dbId = getDBIDByFilter(f);
 
 		if (newDB) {
 			String fromDBFileId = DBDIR + File.separator + getTgDBID(f.city);
@@ -309,9 +343,6 @@ public class AllTgMgr {
 		List<Process> ps = new ArrayList<Process>();
 		try {
 			Process p = exeCpyCmd(fromDBFileId+".script", toDBFileId+".script");
-			if (p != null) ps.add(p);
-			
-			p = exeCpyCmd(fromDBFileId+".script", toDBFileId+".script");
 			if (p != null) ps.add(p);
 			
 			p = exeCpyCmd(fromDBFileId+".properties", toDBFileId+".properties");
@@ -356,6 +387,10 @@ public class AllTgMgr {
 	private String getTgDBID(String city) {
 		return tgDBId + "." + city;
 	}
+	
+	private String getFilterStrFromDBID(String dbId) {
+		return dbId.substring(tgDBId.length());
+	}
 
 	private String genTgSort(UserFilter f) {
 		return "ORDER BY dist"; //TODO 带实现其他排序
@@ -393,5 +428,9 @@ public class AllTgMgr {
 		return hasOneCond ? sb.toString() : "";
 	}
 	
+	/**
+	 * UserFilter.toString -> true/false的映射，<br>
+	 * 说明是否存在此过滤条件的缓存DB <br>
+	 */
 	private Map<String,Boolean> fltdb = new HashMap<String,Boolean>();
 }

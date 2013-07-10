@@ -21,6 +21,10 @@ function onLoad() {
 	gMap = new BMap.Map("out");
 	gMap.centerAndZoom(new BMap.Point(116.414, 39.915), 15);
 	gMap.enableKeyboard();
+	
+	gMap.addEventListener("click", function(e){    
+		 $("#txtoutdetail").append("<p>lng="+e.point.lng + ", lat=" + e.point.lat+"</p>");    
+	});
 }
 function drv(p1, p2) {
 	var driving = new BMap.DrivingRoute(gMap, {

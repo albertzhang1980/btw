@@ -104,7 +104,8 @@ public class P2PInfoMgr {
 	public synchronized void closeDB(String city) throws Exception {
 		try {
 			Connection cn = getCon(city, false);
-			cn.createStatement().execute("SHUTDOWN IMMEDIATELY");
+			cn.createStatement().execute("CHECKPOINT");
+			cn.createStatement().execute("SHUTDOWN");
 			cn.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -135,6 +136,7 @@ public class P2PInfoMgr {
 				s.execute("SET FILES BACKUP INCREMENT FALSE");
 				createTB(s);
 				cn.commit();
+				s.execute("CHECKPOINT");
 				s.close();
 			} catch (Exception e) {
 				e.printStackTrace();

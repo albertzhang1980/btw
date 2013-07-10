@@ -49,7 +49,7 @@ body {
 	margin:80px 132px 0px 132px;
 	padding:0px 0px 0px 0px;
 }
-#idFootor {
+#idFootor,#more {
 	width:1000px;
 	height:50px;
 	background-color:red;
@@ -149,8 +149,7 @@ body {
 	padding:0;
 	border:solid rgb(220, 50, 50);
 	position:relative;
-	left:250px;
-	top:-30px;
+	left:100px;
 	width:65px;
 	font-size:20px;
 	color:white;
@@ -160,5 +159,8 @@ a:link,a:visited,a:hover,a:active {
 	text-decoration:none;
 	color:#000000;
 }
-
+#more{
+	background-color:#bfbfbf;
+	height:20px;
+}
 
