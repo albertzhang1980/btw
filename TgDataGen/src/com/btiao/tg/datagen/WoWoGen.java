@@ -83,6 +83,9 @@ public class WoWoGen extends Gen {
 			shop.shopArea = ((Node)shopNode.selectNodes("area").get(0)).getText();
 			shop.longitude = doubleLatLon2Long(((Node)shopNode.selectNodes("longitude").get(0)).getText());
 			shop.latitude = doubleLatLon2Long(((Node)shopNode.selectNodes("latitude").get(0)).getText());
+			
+			shop.longitude += 116428301 - 116422000;
+			shop.latitude += 40048130 - 40042000;
 		}
 		
 		return true;

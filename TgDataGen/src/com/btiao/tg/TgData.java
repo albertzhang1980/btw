@@ -74,5 +74,6 @@ public class TgData {
 //	public String nameOfOrigWebSite;
 //	public String urlOfOrigWebSite;
 	
-	public int dist = -1; //距离，-1表示未知
+	public int dist = 1000*1000; //距离，默认表示未知
+	public String shopName = ""; //商家名称
 }
