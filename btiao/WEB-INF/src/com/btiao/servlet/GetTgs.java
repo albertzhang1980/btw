@@ -70,6 +70,7 @@ public class GetTgs extends HttpServlet {
 				maskAttr.put("dist", true);
 				maskAttr.put("longitude", true);
 				maskAttr.put("latitude", true);
+				maskAttr.put("shopName", true);
 				
 				JsonCvt.obj(tgs.get(0), sb, maskAttr);
 				for (int i=1; i<num; ++i) {

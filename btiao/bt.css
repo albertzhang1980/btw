@@ -2,6 +2,7 @@ body {
 	font-size:14px;
 	margin:0;
 	padding:0;
+	font-family: tahoma, arial, ËÎÌו;
 }
 #idNavigator {
 	height:80px;
@@ -49,13 +50,15 @@ body {
 	margin:80px 132px 0px 132px;
 	padding:0px 0px 0px 0px;
 }
-#idFootor,#more {
+#idFootor {
 	width:1000px;
 	height:50px;
-	background-color:red;
 	float:left;
-	margin:0px 132px 0px 132px;
-	padding:0px 0px 0px 0px;
+	margin:30px 132px 0px 132px;
+	padding:10px 0px 0px 0px;
+	text-align:center;
+	border-top:red solid 2px;
+	color:#b0b0b0;
 }
 
 #idSelectMode {
@@ -106,21 +109,25 @@ body {
 	margin:0px 0px 0px 0px;
 	padding:0px 0px 0px 0px;
 }
-.cTgUnit {
-	width:350px;
-	height:380px;
-	background-color:#f7f7f7;
-	margin:0px 0px 0px 0px;
+.cTgUnitLeft,.cTgUnitRight {
+	border-radius:5px;
+	width:340px;
+	height:345px;
+	background-color:#a7a7a7;
+	margin:10px 10px 10px 0px;
 	padding:0px 0px 0px 0px;
+}
+.cTgUnitRight {
+	margin:10px 0px 10px 10px;
 }
 
 .ctgImg {
 	width: 330px;
 	height:200px;
-	padding:10px 10px 5px 10px;
+	padding:5px;
 }
 .ctgTitle {
-	height:64px;
+	height:50px;
 	margin:0;
 	padding: 5px 10px 5px 10px;
 	font-size: 14px;
@@ -142,25 +149,38 @@ body {
 	text-decoration: line-through;
 	font-size:16px;
 	font-weight:normal;
-	color:#a0a0a0;
+	color:#a02020;
 }
 .cGo{
 	margin:0;
 	padding:0;
-	border:solid rgb(220, 50, 50);
 	position:relative;
-	left:100px;
+	float:right;
 	width:65px;
 	font-size:20px;
 	color:white;
-	background-color:rgb(200,50,50);
+	border:solid #af4f4f;
+	background-color:#af4747;
+	border-radius:4px;
+}
+.cDist{
+	border-top:#9f9f9f solid 2px;
+	padding-top:5px;
+	font-size:12px;
 }
 a:link,a:visited,a:hover,a:active {
 	text-decoration:none;
 	color:#000000;
 }
 #more{
-	background-color:#bfbfbf;
-	height:20px;
+	color:#909090;
+	background-color:#efefef;
+	width:700px;
+	height:28px;
+	float:left;
+	margin:10px 132px 0px 132px;
+	padding:10px 0px 0px 0px;
+	text-align:center;
+	border-radius:5px;
 }
 

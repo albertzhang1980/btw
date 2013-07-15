@@ -44,7 +44,7 @@ function refreshTg(wantEmpty) {
 		}
 		
 		for (var idx=0; idx<rst.tgs.length; ++idx) {
-			var tgHtml = '<li class="cTgLi"><div class="cTgUnit">';
+			var tgHtml = '<li class="cTgLi"><div class="'+(idx%2==0?'cTgUnitLeft':'cTgUnitRight')+'">';
 			tgHtml += genTgHtml(rst.tgs[idx]);
 			tgHtml += '</div></li>';
 			$("#idTgList").append(tgHtml);
@@ -52,8 +52,12 @@ function refreshTg(wantEmpty) {
 		
 		if (rst.tgs.length < page_size) {
 			hasMore = false;
+			
 			$("#more").empty();
-			$("#more").append("没有团购了");
+			$("#more").append("《您要的信息均已呈现》");
+		} else {
+			$("#more").empty();
+			$("#more").append("还有更多...");
 		}
 	});
 }
@@ -82,16 +86,24 @@ function genTgHtml(tg) {
 	r += '&nbsp;&nbsp;</span>';
 	r += '<a class="cGo" target="_blank" href="';
 	r += tg.url;
-	r += '">去看看</a></p>';
-	r += '<p><span>'+tg.dist+'&nbsp;米</span>';
-	r += '<span>&nbsp;&nbsp;<a href="'+genLineUrl('北京',uLon,uLat,tg.longitude,tg.latitude)+'" target="_blank">查看路线</a></span>';
+	r += '" title="'+tg.shopName+'">去看看</a></p>';
+	var dist = distMode(tg.dist);
+	if (dist == 0) {
+		r += '<p class="cDist"><span>500&nbsp;米以内</span>';
+	} else {
+		r += '<p class="cDist"><span>大约'+distMode(tg.dist)+'&nbsp;米</span>';
+	}
+	r += '<span>&nbsp;|&nbsp;&nbsp;<a href="'+genLineUrl('北京',uLon,uLat,tg.longitude,tg.latitude,tg.shopName)+'" target="_blank" title="'+tg.shopName+'">查看大概路线</a></span>';
 	r += '</p></div>'
 		
 	return r;
 }
-function genLineUrl(city, uLon, uLat, tgLon, tgLat) {
+function distMode(dist) {
+	return parseInt(dist/500)*500;
+}
+function genLineUrl(city, uLon, uLat, tgLon, tgLat, shopName) {
 	return 'http://api.map.baidu.com/direction?origin=latlng:'+uLat/1000000+','+uLon/1000000+'|name:您的位置'+
-		'&destination=latlng:'+tgLat/1000000+','+tgLon/1000000+'|name:团购位置'+'&output=html&mode=driving'+
+		'&destination=latlng:'+tgLat/1000000+','+tgLon/1000000+'|name:'+shopName+'&output=html&mode=driving'+
 		'&region='+city;
 }
 
@@ -100,12 +112,35 @@ function scrollEvent(evt) {
 	var verticalScroll = window.pageYOffset;
 
 	var element = document.getElementById("more");
-	var actualTop = getY(element) + 665;	
+	var actualTop = getY(element) + 665;
+	
 	if (viewportHeight >= (actualTop - verticalScroll)) {
+		if (scrollEvent.lastMoreState == "display") {
+			return;
+		}
+		
+		scrollEvent.lastMoreState = "display";
+		
 		if (hasMore) {
-			refreshTg();
+			var second = 3;
+			setTimeout(function() {
+				$("#more").empty();
+				$("#more").append("马上查询下一页... 倒计时（"+(second)+"）秒");
+				if (second == 0) {
+					refreshTg();
+					$("#more").empty();
+					$("#more").append("正在查询下一页... ");
+				} else {
+					setTimeout(arguments.callee, 1000);
+				}
+				
+				-- second;
+			}, 500);
+
 			//alert("top="+actualTop+",hegiht="+viewportHeight+",verticalScroll="+verticalScroll)
 		}
+	} else {
+		scrollEvent.lastMoreState = "hide";
 	}
 }
 function getY(element) {
@@ -113,15 +148,8 @@ function getY(element) {
     for(var e = element; e; e = e.offsetParent) // Iterate the offsetParents
         y += e.offsetTop;                       // Add up offsetTop values
 
-    // Now loop up through the ancestors of the element, looking for
-    // any that have scrollTop set. Subtract these scrolling values from
-    // the total offset. However, we must be sure to stop the loop before
-    // we reach document.body, or we'll take document scrolling into account
-    // and end up converting our offset to window coordinates.
     for(e = element.parentNode; e && e != document.body; e = e.parentNode)
         if (e.scrollTop) y -= e.scrollTop;  // subtract scrollbar values
-
-    // This is the Y coordinate with document-internal scrolling accounted for.
     return y;
 }
 
