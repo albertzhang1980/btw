@@ -4,13 +4,21 @@ function onload() {
 //global variable
 var uLon = 116425000;
 var uLat = 40052000;
-var btGlobal = {};
+btiao.tgGlobal = {};
 
 var nextPageIdx = 0;
 var page_size = 10;
 var hasMore = true;
 
+var recentTg = [];
+var RECENT_LIMIT = 10;
+
 //function define
+function clearRecent() {
+	recentTg = [];
+	storeRecent();
+	loadRecent();
+}
 function refreshPos() {
 	var url = "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js";
 	$.getScript(url, function() {
@@ -19,8 +27,12 @@ function refreshPos() {
 		cityName.append(remote_ip_info.city);
 		
 		if (remote_ip_info.city == "北京") {
-			btGlobal.curTgCity = "beijing";
+			btiao.tgGlobal.curTgCity = "beijing";
 		}
+		
+		//当前仅支持北京，调试代码
+		//TODO
+		btiao.tgGlobal.curTgCity = "beijing";
 	});
 }
 
@@ -29,12 +41,12 @@ function refreshTg(wantEmpty) {
 		$("#idTgList").empty();
 	}
 	
-	if (!btGlobal.curTgCity || btGlobal.curTgCity == "") {
+	if (!btiao.tgGlobal.curTgCity || btiao.tgGlobal.curTgCity == "") {
 		setTimeout(refreshTg, 200);
 		return;
 	}
 	
-	var url = "../GetTgs?pgs="+page_size+"&idx="+(nextPageIdx++)*page_size+"&city="+btGlobal.curTgCity+
+	var url = "../GetTgs?pgs="+page_size+"&idx="+(nextPageIdx++)*page_size+"&city="+btiao.tgGlobal.curTgCity+
 			"&uLon="+uLon+"&uLat="+uLat;
 	
 	$.getScript(url, function() {
@@ -62,19 +74,74 @@ function refreshTg(wantEmpty) {
 	});
 }
 
-btGlobal.genTgHtml = genTgHtml;
+btiao.tgGlobal.insertRecent = insertRecent;
+function insertRecent(name, url, title) {
+	if (name.length > 18) {
+		name = name.substring(0, 20) + "...";
+	}
+
+	for (var i=0; i<recentTg.length; ++i) {
+		if (recentTg[i].name == name && recentTg[i].url == url) {
+			return;
+		}
+	}
+	
+	var d = {name:name,url:url,title:title};
+	recentTg.push(d);
+	
+	if (recentTg.length > RECENT_LIMIT) {
+		recentTg = recentTg.slice(recentTg.length-RECENT_LIMIT,recentTg.length);
+	}
+	
+	refreshRecent();
+}
+function refreshRecent() {
+	$("#idAllLook").empty();
+	for (var i=recentTg.length-1; i>=0&&i>(recentTg.length-RECENT_LIMIT); --i) {
+		var html = '<p><a class="cRecentHref" target="_blank" title="'+ recentTg[i].title + '" href="'+ recentTg[i].url +'">';
+		html += recentTg[i].name;
+		html += '</a></p>';
+		$("#idAllLook").append(html);
+	}
+	
+	storeRecent();
+}
+function storeRecent() {
+	if (localStorage) {
+		localStorage["recentTg"] = JSON.stringify(recentTg);
+	}
+}
+function loadRecent() {
+	if (localStorage) {
+		var recent = localStorage["recentTg"];
+		if (recent) {
+			recentTg = JSON.parse(recent);
+			refreshRecent();
+		}		
+	}
+}
+
+function genGoCode(tg) {
+	var code = 'btiao.tgGlobal.insertRecent(';
+	code += '\'' + tg.shopName + '\',';
+	code += '\'' + tg.url + '\',';
+	code += '\'' + tg.title + '\'';
+	code += ')';
+	return code;
+}
+
 function genTgHtml(tg) {
-	var r = '<a target="_blank" href="';
+	var r = '<a onclick="'+genGoCode(tg)+'" target="_blank" href="';
 	r += tg.url;
 	r += '"><img class="ctgImg" src="';
 	r += tg.imageUrl;
 	r += '"/></a>';
-	r += '<p class="ctgTitle" title="'+tg.title+'"><a target="_blank" href="';
+	r += '<p class="ctgTitle"><span><a class="cTgTileHref" title="'+tg.title+'" onclick="'+genGoCode(tg)+'" target="_blank" href="';
 	r += tg.url;
 	r += '">';
 	var endIdx = tg.title.length > 60 ? 60 : tg.title.length;
 	r += tg.title.substring(0, endIdx);
-	r += '</a></p>';
+	r += '</a></span></p>';
 	r += '<div class="cPriceLine"><p>';
 	r += '<span class="cMoneySign">¥</span>';
 	r += '<span class="cPrice">';
@@ -84,16 +151,16 @@ function genTgHtml(tg) {
 	r += '<span class="cValue">¥';
 	r += tg.value/100;
 	r += '&nbsp;&nbsp;</span>';
-	r += '<a class="cGo" target="_blank" href="';
+	r += '<a onclick="'+genGoCode(tg)+'" class="cGo" target="_blank" href="';
 	r += tg.url;
-	r += '" title="'+tg.shopName+'">去看看</a></p>';
+	r += '" title="'+tg.shopName+'">Go!&nbsp;看看</a></p>';
 	var dist = distMode(tg.dist);
 	if (dist == 0) {
 		r += '<p class="cDist"><span>500&nbsp;米以内</span>';
 	} else {
 		r += '<p class="cDist"><span>大约'+distMode(tg.dist)+'&nbsp;米</span>';
 	}
-	r += '<span>&nbsp;|&nbsp;&nbsp;<a href="'+genLineUrl('北京',uLon,uLat,tg.longitude,tg.latitude,tg.shopName)+'" target="_blank" title="'+tg.shopName+'">查看大概路线</a></span>';
+	r += '<span>&nbsp;|&nbsp;&nbsp;<a class="cCheckRoute" href="'+genLineUrl('北京',uLon,uLat,tg.longitude,tg.latitude,tg.shopName)+'" target="_blank" title="'+tg.shopName+'">查看大概路线</a></span>';
 	r += '</p></div>'
 		
 	return r;
@@ -153,11 +220,16 @@ function getY(element) {
     return y;
 }
 
-
 //global code
+loadRecent();
 refreshPos();
 refreshTg(true);
 var elm = document.getElementsByTagName("body")[0];
 elm.addEventListener("scroll",scrollEvent, false);
 window.onscroll = scrollEvent;
+$("#idRet2Top").click(function() {
+	window.scrollTo(0,0);
+});
+$("#idClearRecent").click(clearRecent);
+
 };

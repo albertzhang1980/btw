@@ -114,7 +114,7 @@ public class AllTgMgr {
 		}
 		
 		List<TgData> r = getTgBlockData(inRange, f, idx, num);
-		return r;	
+		return r;
 	}
 	
 	private AllTgMgr() {
@@ -247,6 +247,7 @@ public class AllTgMgr {
 			cnp2p = getPosDBCon(f);
 			Statement s = cnp2p.createStatement();
 			
+			int find_pos_failed_num = 0;
 			for (TgData tg : tgs) {
 				String sql = "select * from tb_p2pinfo_dist " + genPosWhere(tg, f);
 				ResultSet rst = s.executeQuery(sql);
@@ -262,8 +263,12 @@ public class AllTgMgr {
 					} else {
 						cn.commit();
 					}
-				}			
+				} else {
+					++ find_pos_failed_num;
+					System.err.println("find pos failed! sql="+sql);
+				}
 			}
+			System.err.println("total find_pos_failed_num="+find_pos_failed_num+" in "+tgs.size());
 			
 			cn.commit();
 			
@@ -389,7 +394,7 @@ public class AllTgMgr {
 	}
 	
 	private String getFilterStrFromDBID(String dbId) {
-		return dbId.substring(tgDBId.length());
+		return dbId.substring(tgDBId.length()+1); //'.'分割符号还占用1个字符
 	}
 
 	private String genTgSort(UserFilter f) {

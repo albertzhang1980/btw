@@ -3,49 +3,131 @@ body {
 	margin:0;
 	padding:0;
 	font-family: tahoma, arial, ËÎÌו;
+	overflow-x:hidden;
 }
-#idNavigator {
+a:link{
+	text-decoration:none;
+	color:#a0a0a0;
+}
+a:visited{
+	text-decoration:none;
+	color:#a0a0a0;
+}
+a:hover{
+	text-decoration:underline;
+	color:#ffffff;
+}
+a:active {
+	text-decoration:none;
+	color:#a0a0a0;
+}
+
+#idRet2Top,#idRet2Top:hover{
+	background-color:#707070;
+	color:#f7f7f7;
+	position:fixed;
+	z-index:998;
+	top:400px;
+	left:457px;
+	width:40px;
+	text-align:center;
+	cursor:pointer;
+	border:solid #707070 4px;
+}
+#idRet2TopAim0{
+	border-top:#f0f0f0 solid 4px;
+}
+#idRet2TopAim1{
+	border:solid;
+	border-color:#707070 #707070 #f0f0f0 #707070;
+	border-width:0px 20px 10px 20px;
+	margin:5px 0 0 0;
+}
+#idRet2TopAim2{
+	border:solid;
+	border-color:#707070 #707070 #707070 #707070;
+	border-width:0px 12px 0px 12px;
+	background-color:#f0f0f0;
+	height:15px;
+	margin:0;
+}
+#idNavigator{
 	height:80px;
 	position:fixed;
 	z-index:998;
-	width:1264px;
+	width:100%;
 	top:0px;
 	left:0px;
-	background-color:#f8f7f8;
-	margin: 
+	background-color:#606060;
+	color:#f0f0f0;
 }
-
-#idNavgLeft {
-	margin:10px 0px 0px 132px;
-	float:left;
+.cCumFrom{
+	color:#a0a0a0;
 }
-#idNavgRight {
-	margin:10px 132px 0px 0px;
-	float:right;
+.cNavgPart{
+	margin:10px 0 0 0;
+	position:relative;
+}
+.cNavgLine1{
+	margin:10px 0 0 0;
+	font-size:16px;
+}
+.cNavgLine2{
+	margin:20px 0 0 0;
+	font-size:12px;
+}
+.cNavgBigLine{
+	margin:30px 0 0 0;
+	font-size:24px;
+}
+.cNavgLitLine{
+	margin:36px 0 0 0;
+	font-size:12px;
+}
+.cTxtAlignC{
+	text-align:center;
+}
+#idNavgLeft{
+	top:0px;
+	left:132px;
+}
+#idNavgRight{
+	top:0px;
+	right:132px;
+}
+#idNavgRight2{
+	top:0px;
+	right:160px;
 }
 #idLogo {
-	float:left;
 	border-style:solid;
 	border-width:5px;
 	border-color:transparent;
 	height:60px;
 	z-index:999;
-	display:inline-block;
 }
-.cNavg{
-	font:28px bold;
-	float:left;
-	border-style:solid;
-	border-width:20px 0px 10px 10px;
-	border-color:transparent;
-	margin:0;
+.cInLine{
 	display:inline-block;
-}
-.cCur {
-	font-size:16px;
-	border-width:34px 0px 10px 10px;
 }
 
+.cFR {
+	float:right;
+}
+.cFL {
+	float:left;
+}
+#curCity{
+	font-size:20px;
+}
+.cCur{
+	font-size:14px;
+	border-width:34px 0px 10px 10px;
+}
+.cBt{
+	margin:32px 0px 10px 10px;
+	border-radius:5px;
+	font-size:14px;
+}
 #idContainer {
 	margin:80px 132px 0px 132px;
 	padding:0px 0px 0px 0px;
@@ -63,35 +145,48 @@ body {
 
 #idSelectMode {
 	width:710px;
-	background-color:blue;
 	margin:0px 0px 0px 0px;
-	padding:0px 0px 0px 0px;
+	padding:10px 0px 0px 0px;
 	float:left;
 }
 .cSelMode {
 	border-style:solid;
-	border-width:5px;
-	border-color:#efefef;
-	font-size:24px;
-	background-color:green;
+	border-width:10px;
+	border-color:#a05050;
+	font-size:16px;
+	color:#a0a0a0;
+	float:left;
+	background-color:#a05050;
+	border-radius:10px;
+	margin:5px;
 }
-.cSelModeLast {
-	border-width:20px 10px 10px 10px;
+.cSelModeUsed {
+	font-weight:bold;
+	background-color:#a02020;
+	border-color:#a02020;
+	color:#f0f0f0;
 }
 
 #idAdv,#idLastLook {
 	/*display:none;*/
 	width:264px;
-	height:500px;
-	background-color:#f8f8f8;
+	background-color:#a7a7a7;
 	float:right;
 	margin:10px 0px 0px 0px;
-	padding:0px 0px 0px 0px;
+	padding:10px 5px 10px 5px;
+	border-radius:5px;
+	font-size:12px;
 }
-#idLastLook {
-	margin:0px 0px 0px 0px;
+#idAllLook{
+	margin:0;
+	padding:0;
 }
-
+#idLastLook > p,#idClearRecent{
+	font-weight:bold;
+}
+#idClearRecent{
+	color:#505050;
+}
 #idAllTg {
 	/*display:none;*/
 	margin:0px 0px 0px 0px;
@@ -120,7 +215,6 @@ body {
 .cTgUnitRight {
 	margin:10px 0px 10px 10px;
 }
-
 .ctgImg {
 	width: 330px;
 	height:200px;
@@ -132,6 +226,23 @@ body {
 	padding: 5px 10px 5px 10px;
 	font-size: 14px;
 }
+.cTgTileHref:link,.cTgTileHref:visited,.cRecentHref:link,.cRecentHref:visited{
+	text-decoration:none;
+	color:#303030;
+}
+.cCheckRoute:link,.cCheckRoute:visited{
+	text-decoration:none;
+	color:#af4747;
+}
+.cTgTitleHref:hover,.cCheckRoute:hover,.cRecentHref:hover{
+	text-decoration:underline;
+	color:#ffffff;
+}
+.cTgTileHref:active,.cCheckRoute:active{
+	text-decoration:none;
+	color:#303030;
+}
+
 .cPriceLine, .cPriceLine p{
 	margin:5px 10px 5px 10px;
 }
@@ -152,12 +263,12 @@ body {
 	color:#a02020;
 }
 .cGo{
-	margin:0;
+	margin:5px 0 0 0;
 	padding:0;
 	position:relative;
 	float:right;
-	width:65px;
-	font-size:20px;
+	width:70px;
+	font-size:16px;
 	color:white;
 	border:solid #af4f4f;
 	background-color:#af4747;
@@ -168,12 +279,8 @@ body {
 	padding-top:5px;
 	font-size:12px;
 }
-a:link,a:visited,a:hover,a:active {
-	text-decoration:none;
-	color:#000000;
-}
 #more{
-	color:#909090;
+	color:#707070;
 	background-color:#efefef;
 	width:700px;
 	height:28px;
@@ -183,4 +290,3 @@ a:link,a:visited,a:hover,a:active {
 	text-align:center;
 	border-radius:5px;
 }
-
