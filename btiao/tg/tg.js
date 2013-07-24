@@ -13,6 +13,8 @@ var hasMore = true;
 var recentTg = [];
 var RECENT_LIMIT = 10;
 
+var lastSelModeId = "idSelModeNormal";
+
 //function define
 function clearRecent() {
 	recentTg = [];
@@ -36,9 +38,20 @@ function refreshPos() {
 	});
 }
 
+function genFilerArgs() {
+	if (lastSelModeId == "idSelModeFD") {
+		return '&tgType=1';
+	} else if (lastSelModeId == "idSelModeDY") {
+		return '&tgType=20000';
+	} else {
+		return "";
+	}
+}
+
 function refreshTg(wantEmpty) {
 	if (wantEmpty) {
 		$("#idTgList").empty();
+		idx = 0;
 	}
 	
 	if (!btiao.tgGlobal.curTgCity || btiao.tgGlobal.curTgCity == "") {
@@ -47,7 +60,7 @@ function refreshTg(wantEmpty) {
 	}
 	
 	var url = "../GetTgs?pgs="+page_size+"&idx="+(nextPageIdx++)*page_size+"&city="+btiao.tgGlobal.curTgCity+
-			"&uLon="+uLon+"&uLat="+uLat;
+			"&uLon="+uLon+"&uLat="+uLat+genFilerArgs();
 	
 	$.getScript(url, function() {
 		var result = rst.result;
@@ -220,6 +233,29 @@ function getY(element) {
     return y;
 }
 
+function food() {
+	changeSelState("idSelModeFD");
+}
+function film() {
+	changeSelState("idSelModeDY");
+}
+function normal() {
+	changeSelState("idSelModeNormal");
+}
+function changeSelState(now) {
+	if (now == lastSelModeId) {
+		return;
+	}
+	
+	var cSelModeUsed = "cSelModeUsed";
+	$("#"+lastSelModeId).removeClass(cSelModeUsed);
+	$("#"+now).addClass(cSelModeUsed);
+	
+	lastSelModeId = now;
+	
+	refreshTg(true);
+}
+
 //global code
 loadRecent();
 refreshPos();
@@ -231,5 +267,9 @@ $("#idRet2Top").click(function() {
 	window.scrollTo(0,0);
 });
 $("#idClearRecent").click(clearRecent);
+
+$("#idSelModeFD").click(food);
+$("#idSelModeDY").click(film);
+$("#idSelModeNormal").click(normal);
 
 };

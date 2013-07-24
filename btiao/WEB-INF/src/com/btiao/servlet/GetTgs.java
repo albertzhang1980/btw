@@ -127,6 +127,7 @@ public class GetTgs extends HttpServlet {
 		String city = "";
 		int uLongitude = -1;
 		int uLatitude = -1;
+		int tgType = -1;
 				
 		String[] filterArg = args.get("flt");
 		if (filterArg != null && filterArg.length > 0) {
@@ -137,6 +138,11 @@ public class GetTgs extends HttpServlet {
 				}
 				continue;
 			}
+		}
+		
+		if (args.containsKey("tgType")) {
+			tgType = getIntArg(args, "tgType");
+			f.addFilter("type="+tgType);
 		}
 		
 		city = getStrArg(args, "city");

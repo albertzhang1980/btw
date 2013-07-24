@@ -159,6 +159,7 @@ a:active {
 	background-color:#a05050;
 	border-radius:10px;
 	margin:5px;
+	cursor:pointer;
 }
 .cSelModeUsed {
 	font-weight:bold;
