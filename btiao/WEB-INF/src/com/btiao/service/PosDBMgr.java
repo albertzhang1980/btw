@@ -159,12 +159,17 @@ public class PosDBMgr {
 		int startX = Integer.parseInt(splitDbId2[7]);
 		int endX = Integer.parseInt(splitDbId2[8]);
 		
-		range.leftBottomLon = Integer.parseInt(splitDbId2[1]) + stepX*startX;
-		range.leftBottomLat = Integer.parseInt(splitDbId2[2]);
-		range.rightUpLat = range.leftBottomLat + stepY*numY;
-		range.rightUpLon = range.leftBottomLon + stepX*endX;
-		range.stepLat = stepY;
+		int originLon = Integer.parseInt(splitDbId2[1]);
+		int originLat = Integer.parseInt(splitDbId2[2]);
+		
+		range.leftBottomLon = originLon + stepX*startX;
+		range.leftBottomLat = originLat;
+		
+		range.rightUpLon = originLon + stepX*endX;
+		range.rightUpLat = originLat + stepY*numY;
+		
 		range.stepLon = stepX;
+		range.stepLat = stepY;
 		
 		posDBMap.put(range, dbId);
 	}
