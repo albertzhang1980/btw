@@ -25,6 +25,8 @@ public abstract class Gen {
 		
 		Gen wowoGen = new WoWoGen();
 		gens.add(wowoGen);
+		Gen mtGen = new MeiTuanGen();
+		gens.add(mtGen);
 		
 		Gen.setCity("beijing");
 		Gen.initDB();
@@ -185,7 +187,7 @@ public abstract class Gen {
 			
 			return (int)(r*100);
 		} catch (Exception e) {
-			return null;
+			return 0;
 		}
 	}
 	
@@ -214,8 +216,9 @@ public abstract class Gen {
 		}
 		
 		String sql = null;
+		Statement s = null;
 		try {
-			Statement s = tgCon.createStatement();
+			s = tgCon.createStatement();
 			for (TgShop shopTmp : shopsTmp) {
 				sql = genInsertTgSql(tgTmp, shopTmp);
 				s.execute(sql);
@@ -225,6 +228,8 @@ public abstract class Gen {
 		} catch (Exception e) {
 			System.err.println("sql="+sql);
 			e.printStackTrace();
+		} finally {
+			if (s != null) s.close();
 		}
 		
 		dbTgs.put(tgTmp.url, "");

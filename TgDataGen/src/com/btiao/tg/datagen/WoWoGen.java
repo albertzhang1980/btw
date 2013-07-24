@@ -3,6 +3,7 @@ package com.btiao.tg.datagen;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +63,9 @@ public class WoWoGen extends Gen {
 		tgTmp.startTime = tmStr2Long(((Node)tgNode.selectNodes("data/display/startTime").get(0)).getText());
 		tgTmp.endTime = tmStr2Long(((Node)tgNode.selectNodes("data/display/endTime").get(0)).getText());
 		String type = ((Node)tgNode.selectNodes("data/display/catName").get(0)).getText();
-		tgTmp.type = convertType(type);
+		List<String> typeList = new ArrayList<String>();
+		typeList.add(type);
+		tgTmp.type = convertType(typeList);
 		tgTmp.value = priceStr2Int(((Node)tgNode.selectNodes("data/display/value").get(0)).getText());
 		tgTmp.price = priceStr2Int(((Node)tgNode.selectNodes("data/display/price").get(0)).getText());
 		tgTmp.boughtNum = str2Int(((Node)tgNode.selectNodes("data/display/bought").get(0)).getText());
@@ -84,8 +87,9 @@ public class WoWoGen extends Gen {
 			shop.longitude = doubleLatLon2Long(((Node)shopNode.selectNodes("longitude").get(0)).getText());
 			shop.latitude = doubleLatLon2Long(((Node)shopNode.selectNodes("latitude").get(0)).getText());
 			
-			shop.longitude += 116428301 - 116422000;
-			shop.latitude += 40048130 - 40042000;
+			//高德地图坐标与百度地图坐标有些误差，大概就偏下
+			shop.longitude += 6400;
+			shop.latitude += 5730;
 		}
 		
 		return true;
@@ -111,7 +115,7 @@ public class WoWoGen extends Gen {
 
 	@Override
 	protected void postGen() throws Exception {
-		FileOutputStream fout = new FileOutputStream("wowo_unkowntype.txt");
+		FileOutputStream fout = new FileOutputStream(getName()+"."+city+".unkowntype.txt");
 		try {
 			Set<Entry<String,String>> entrys = unkownTypeStrs.entrySet();
 			for (Entry<String,String> entry : entrys) {
@@ -122,11 +126,19 @@ public class WoWoGen extends Gen {
 		}
 	}
 	
-	private int convertType(String type) {
-		if (type.equals("其他火锅")) {
-			return TgData.TgType.food_huoguo;
-		} else if (type.equals("特色餐厅")) {
+	protected int convertType(List<String> typeStrList) {
+		String type = typeStrList.get(0);
+		if (type.contains("火锅") ||
+			type.contains("餐厅")||
+			type.contains("西餐")||
+			type.contains("烧烤")||
+			type.contains("海鲜")) {
 			return TgData.TgType.food;
+		} else if (type.contains("电影") ||
+			type.contains("卡通") ||
+			type.contains("大片") ||
+			type.contains("动画")) {
+			return TgData.TgType.film;
 		}
 		else {
 			unkownTypeStrs.put(type, "");
@@ -134,10 +146,8 @@ public class WoWoGen extends Gen {
 		}
 	}
 	
-	private List<Node> tgNodes = null;
-	private int index = 0;
+	protected List<Node> tgNodes = null;
+	protected int index = 0;
 	
-	private Map<String,String> unkownTypeStrs = new HashMap<String,String>();
-	
-	private String city; 
+	protected Map<String,String> unkownTypeStrs = new HashMap<String,String>();
 }
