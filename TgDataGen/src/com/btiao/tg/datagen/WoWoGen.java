@@ -128,11 +128,21 @@ public class WoWoGen extends Gen {
 	
 	protected int convertType(List<String> typeStrList) {
 		String type = typeStrList.get(0);
-		if (type.contains("»ğ¹ø") ||
-			type.contains("²ÍÌü")||
-			type.contains("Î÷²Í")||
-			type.contains("ÉÕ¿¾")||
-			type.contains("º£ÏÊ")) {
+		if (type.contains("Ìğµã") ||
+			type.contains("²Í")||
+			type.contains("¿¾")||
+			type.contains("º£ÏÊ")||
+			type.contains("²Ë")||
+			type.contains("ÁÏÀí")||
+			type.contains("Òû")||
+			type.contains("¸â")||
+			type.contains("¹ø")||
+			type.contains("±ùä¿ÁÖ")||
+			type.contains("¿§·È")||
+			type.contains("Ê³")||
+			type.contains("ÂéÀ±")||
+			type.contains("ÅûÈø")||
+			type.contains("Ğ¡³Ô")) {
 			return TgData.TgType.food;
 		} else if (type.contains("µçÓ°") ||
 			type.contains("¿¨Í¨") ||

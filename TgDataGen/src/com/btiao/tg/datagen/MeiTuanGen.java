@@ -50,6 +50,7 @@ public class MeiTuanGen extends WoWoGen {
 			shopsTmp.add(shop);
 			
 			shop.name = ((Node)shopNode.selectNodes("shop_name").get(0)).getText();
+			tgTmp.desc = "¡¾" + shop.name + "¡¿" + tgTmp.desc;
 			shop.tel = ((Node)shopNode.selectNodes("shop_tel").get(0)).getText();
 			shop.addr = ((Node)shopNode.selectNodes("shop_addr").get(0)).getText();
 			shop.shopArea = ((Node)shopNode.selectNodes("shop_area").get(0)).getText();

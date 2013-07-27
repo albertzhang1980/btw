@@ -23,10 +23,11 @@ public abstract class Gen {
 		
 		List<Gen> gens = new ArrayList<Gen>();
 		
-		Gen wowoGen = new WoWoGen();
-		gens.add(wowoGen);
-		Gen mtGen = new MeiTuanGen();
-		gens.add(mtGen);
+		gens.add(new WoWoGen());
+		gens.add(new MeiTuanGen());
+		gens.add(new LaShouGen());
+		gens.add(new NuoMiGen());
+		CUT_UNKOWN_TYPE = true;
 		
 		Gen.setCity("beijing");
 		Gen.initDB();
@@ -126,8 +127,9 @@ public abstract class Gen {
 		cn.close();
 	}
 	
+	static public boolean CUT_UNKOWN_TYPE = false;
 	static public String DBDIR = "btdbdir";
-	static public String ORIGIN_TG_DIR = "originTg";
+	static public String ORIGIN_TG_DIR = "originTg"+File.separator+"origin";
 	
 	static public final String tgDBId = "tg";
 	static public final String tgShopDBId= "tgshop";
@@ -154,6 +156,10 @@ public abstract class Gen {
 		preGen();
 		
 		while (genTg()) {
+			if (CUT_UNKOWN_TYPE && this.tgTmp.type == TgData.TgType.unkown) {
+				continue; //未知类型的不便于搜索
+			}
+			
 			if (alreadyAddedTg()) {
 				continue;
 			}
