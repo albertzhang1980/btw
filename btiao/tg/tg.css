@@ -26,7 +26,7 @@ a:active {
 	background-color:#707070;
 	color:#f7f7f7;
 	position:fixed;
-	z-index:998;
+	z-index:10;
 	top:400px;
 	left:457px;
 	width:40px;
@@ -82,6 +82,9 @@ a:active {
 }
 .cNavgLitLine{
 	margin:36px 0 0 0;
+	font-size:12px;
+}
+#idDataOrigin{
 	font-size:12px;
 }
 .cTxtAlignC{
@@ -167,7 +170,23 @@ a:active {
 	border-color:#a02020;
 	color:#f0f0f0;
 }
-
+#idChangePos{
+	position:fixed;
+	float:left;
+	z-index:998;
+	display:none;
+	background-color:#afafaf;
+	margin:0;
+	width:100%;
+}
+#idPosBar{
+	color:#ffffff;
+	margin:0;
+	padding:5px;
+}
+#idMap{
+	height:400px;
+}
 #idAdv,#idLastLook {
 	/*display:none;*/
 	width:264px;
@@ -193,6 +212,14 @@ a:active {
 	margin:0px 0px 0px 0px;
 	padding:0px 0px 0px 0px;
 	float:left;
+}
+#idTgProgress{
+	height:200px;
+	background-color:#a7a7a7;
+	display:none;
+}
+#idNoTgTip{
+	display:none;
 }
 #idTgList {
 	width:710px;
@@ -279,8 +306,9 @@ a:active {
 	border-top:#9f9f9f solid 2px;
 	padding-top:5px;
 	font-size:12px;
+	text-align:right;
 }
-#more{
+#idMoreTg{
 	color:#707070;
 	background-color:#efefef;
 	width:700px;
@@ -290,4 +318,5 @@ a:active {
 	padding:10px 0px 0px 0px;
 	text-align:center;
 	border-radius:5px;
+	display:none;
 }

@@ -1,4 +1,4 @@
-package com.btiao.servlet.gen;
+package com.btiao.tg.servlet.gen;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.btiao.service.gen.P2PInfoMgr;
+import com.btiao.tg.service.gen.P2PInfoMgr;
 
 
 public class DBOper extends HttpServlet {

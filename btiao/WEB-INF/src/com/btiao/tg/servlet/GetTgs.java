@@ -1,4 +1,4 @@
-package com.btiao.servlet;
+package com.btiao.tg.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.btiao.Result;
-import com.btiao.domain.BTiaoExp;
-import com.btiao.domain.UserFilter;
-import com.btiao.service.AllTgMgr;
+import com.btiao.tg.Result;
 import com.btiao.tg.TgData;
+import com.btiao.tg.domain.BTiaoExp;
+import com.btiao.tg.domain.UserFilter;
+import com.btiao.tg.service.AllTgMgr;
 
 public class GetTgs extends HttpServlet {
 	/**
@@ -71,6 +71,7 @@ public class GetTgs extends HttpServlet {
 				maskAttr.put("longitude", true);
 				maskAttr.put("latitude", true);
 				maskAttr.put("shopName", true);
+				maskAttr.put("desc", true);
 				
 				JsonCvt.obj(tgs.get(0), sb, maskAttr);
 				for (int i=1; i<num; ++i) {

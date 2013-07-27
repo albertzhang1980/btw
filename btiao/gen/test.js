@@ -21,9 +21,11 @@ function onLoad() {
 	gMap = new BMap.Map("out");
 	gMap.centerAndZoom(new BMap.Point(116.414, 39.915), 15);
 	gMap.enableKeyboard();
+	gMap.clearHotspots();
 	
 	gMap.addEventListener("click", function(e){    
-		 $("#txtoutdetail").append("<p>lng="+e.point.lng + ", lat=" + e.point.lat+"</p>");    
+		 $("#txtoutdetail").append("<p>lng="+e.point.lng + ", lat=" + e.point.lat+"</p>");
+		 return false;
 	});
 }
 function drv(p1, p2) {

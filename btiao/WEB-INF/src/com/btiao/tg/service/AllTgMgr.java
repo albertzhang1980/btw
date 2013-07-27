@@ -1,4 +1,4 @@
-package com.btiao.service;
+package com.btiao.tg.service;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.btiao.Result;
-import com.btiao.domain.BTiaoExp;
-import com.btiao.domain.UserFilter;
-import com.btiao.domain.UserFilter.Item;
-import com.btiao.service.gen.P2PInfoMgr;
+import com.btiao.tg.Result;
 import com.btiao.tg.TgData;
+import com.btiao.tg.domain.BTiaoExp;
+import com.btiao.tg.domain.UserFilter;
+import com.btiao.tg.domain.UserFilter.Item;
+import com.btiao.tg.service.gen.P2PInfoMgr;
 
 public class AllTgMgr {
 	static public class FilterRst {

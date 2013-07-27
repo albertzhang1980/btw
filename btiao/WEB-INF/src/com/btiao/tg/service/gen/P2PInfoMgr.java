@@ -1,4 +1,4 @@
-package com.btiao.service.gen;
+package com.btiao.tg.service.gen;
 
 import java.io.File;
 import java.sql.Connection;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.btiao.service.AllTgMgr;
+import com.btiao.tg.service.AllTgMgr;
 
 public class P2PInfoMgr {
 	static public String DBDIR = "posdb";

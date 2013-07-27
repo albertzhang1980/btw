@@ -4,6 +4,7 @@ function onload() {
 //global variable
 var uLon = 116425000;
 var uLat = 40052000;
+var posDesc = "";
 btiao.tgGlobal = {};
 
 var nextPageIdx = 0;
@@ -35,6 +36,8 @@ function refreshPos() {
 		//当前仅支持北京，调试代码
 		//TODO
 		btiao.tgGlobal.curTgCity = "beijing";
+		cityName.empty();
+		cityName.append("北京");
 	});
 }
 
@@ -51,11 +54,13 @@ function genFilerArgs() {
 function refreshTg(wantEmpty) {
 	if (wantEmpty) {
 		$("#idTgList").empty();
-		idx = 0;
+		nextPageIdx = 0;
+		$("#idTgProgress").css("display","block");
+		$("#idMoreTg").css("display","none");
 	}
 	
 	if (!btiao.tgGlobal.curTgCity || btiao.tgGlobal.curTgCity == "") {
-		setTimeout(refreshTg, 200);
+		setTimeout(function() {refreshTg(wantEmpty)}, 200);
 		return;
 	}
 	
@@ -68,6 +73,15 @@ function refreshTg(wantEmpty) {
 			return;
 		}
 		
+		$("#idNoTgTip").css("display", "none");
+		if (wantEmpty) {
+			if (rst.tgs.length > 0) {
+				$("#idTgProgress").css("display","none");
+				$("#idMoreTg").css("display","block");
+			} else {
+				$("#idNoTgTip").css("display", "block");
+			}
+		}
 		for (var idx=0; idx<rst.tgs.length; ++idx) {
 			var tgHtml = '<li class="cTgLi"><div class="'+(idx%2==0?'cTgUnitLeft':'cTgUnitRight')+'">';
 			tgHtml += genTgHtml(rst.tgs[idx]);
@@ -78,11 +92,11 @@ function refreshTg(wantEmpty) {
 		if (rst.tgs.length < page_size) {
 			hasMore = false;
 			
-			$("#more").empty();
-			$("#more").append("《您要的信息均已呈现》");
+			$("#idMoreTg").empty();
+			$("#idMoreTg").append("《您要的信息均已呈现》");
 		} else {
-			$("#more").empty();
-			$("#more").append("还有更多...");
+			$("#idMoreTg").empty();
+			$("#idMoreTg").append("还有更多...");
 		}
 	});
 }
@@ -121,16 +135,35 @@ function refreshRecent() {
 }
 function storeRecent() {
 	if (localStorage) {
-		localStorage["recentTg"] = JSON.stringify(recentTg);
+		localStorage["tg.recentTg"] = JSON.stringify(recentTg);
 	}
 }
 function loadRecent() {
 	if (localStorage) {
-		var recent = localStorage["recentTg"];
+		var recent = localStorage["tg.recentTg"];
 		if (recent) {
 			recentTg = JSON.parse(recent);
 			refreshRecent();
 		}		
+	}
+}
+function storeUserPos(){
+	if (localStorage) {
+		localStorage["tg.uLon"] = uLon;
+		localStorage["tg.uLat"] = uLat;
+		localStorage["tg.posDesc"] = posDesc;
+	}
+}
+function loadUserPos(){
+	if (localStorage) {
+		var lon = localStorage["tg.uLon"];
+		if (lon) uLon = lon;
+		
+		var lat = localStorage["tg.uLat"];
+		if (lat) uLat = lat;
+		
+		var desc = localStorage["tg.posDesc"];
+		if (desc) posDesc = desc;
 	}
 }
 
@@ -149,7 +182,11 @@ function genTgHtml(tg) {
 	r += '"><img class="ctgImg" src="';
 	r += tg.imageUrl;
 	r += '"/></a>';
-	r += '<p class="ctgTitle"><span><a class="cTgTileHref" title="'+tg.title+'" onclick="'+genGoCode(tg)+'" target="_blank" href="';
+	tg.desc = tg.desc.replace(/‘/g, "&apos;");
+	tg.desc = tg.desc.replace(/”/g, "&quot;");
+	tg.desc = tg.desc.replace(/>/g, "&gt;");
+	tg.desc = tg.desc.replace(/</g, "&lt;");
+	r += '<p class="ctgTitle"><span><a class="cTgTileHref" title="'+tg.desc+'" onclick="'+genGoCode(tg)+'" target="_blank" href="';
 	r += tg.url;
 	r += '">';
 	var endIdx = tg.title.length > 60 ? 60 : tg.title.length;
@@ -191,7 +228,7 @@ function scrollEvent(evt) {
 	var viewportHeight = window.innerWidth;
 	var verticalScroll = window.pageYOffset;
 
-	var element = document.getElementById("more");
+	var element = document.getElementById("idMoreTg");
 	var actualTop = getY(element) + 665;
 	
 	if (viewportHeight >= (actualTop - verticalScroll)) {
@@ -204,12 +241,12 @@ function scrollEvent(evt) {
 		if (hasMore) {
 			var second = 3;
 			setTimeout(function() {
-				$("#more").empty();
-				$("#more").append("马上查询下一页... 倒计时（"+(second)+"）秒");
+				$("#idMoreTg").empty();
+				$("#idMoreTg").append("马上查询下一页... 倒计时（"+(second)+"）秒");
 				if (second == 0) {
 					refreshTg();
-					$("#more").empty();
-					$("#more").append("正在查询下一页... ");
+					$("#idMoreTg").empty();
+					$("#idMoreTg").append("正在查询下一页... ");
 				} else {
 					setTimeout(arguments.callee, 1000);
 				}
@@ -233,6 +270,57 @@ function getY(element) {
     return y;
 }
 
+btiao.tgGlobal.changePos = changePos;
+function changePos() {
+	if ($("#idChangePos").css("display") == "block") {
+		$("#idChangePos").css("display", "none");
+		changePos.displayed = false;
+		return;
+	}
+	
+	$("#idChangePos").css("display", "block");
+	gMap = new BMap.Map("idMap");
+	gMap.centerAndZoom(new BMap.Point(116.414, 39.915), 15);
+	gMap.enableKeyboard();
+	gMap.centerAndZoom(new BMap.Point(uLon/1000000, uLat/1000000), 15);
+	gMap.enableScrollWheelZoom();
+	gMap.setDefaultCursor("crosshair");
+	gMap.setDraggingCursor("pointer");
+	
+	changePos.uLon = uLon/1000000;
+	changePos.uLat = uLat/1000000;
+	changePos.posDesc = posDesc;
+	setUserPosSelBar(changePos.uLon, changePos.uLat, changePos.posDesc);
+	
+	gMap.addEventListener("click", function(e){
+		changePos.uLon = e.point.lng;
+		changePos.uLat = e.point.lat;
+		setUserPosSelBar(changePos.uLon, changePos.uLat, "查询中...");
+		
+		var listGeo = new BMap.Geocoder();
+		listGeo.getLocation(new BMap.Point(changePos.uLon, changePos.uLat), 
+			function(result) {
+				if (result) {
+					changePos.posDesc = result.address;
+					
+					if (e.point.lng == changePos.uLon && e.point.lat == changePos.uLat) {
+						//不相同就不要修改了，防止两次getLocation中最后一次先返回，造成显示异常
+						setUserPosSelBar(e.point.lng, e.point.lat, changePos.posDesc);
+					}
+				}
+			}
+		);
+	});
+}
+function setUserPosSelBar(lon, lat, desc) {
+	$("#idSelPos").empty();
+	$("#idSelPos").append(desc + ", 经度("+lon + "), 纬度(" + lat + ")");
+	
+	var mk = new BMap.Marker(new BMap.Point(changePos.uLon, changePos.uLat));
+	mk.setTitle("您选择的当前位置");
+	gMap.clearOverlays();
+	gMap.addOverlay(mk);
+}
 function food() {
 	changeSelState("idSelModeFD");
 }
@@ -255,21 +343,49 @@ function changeSelState(now) {
 	
 	refreshTg(true);
 }
+function displayUserPos() {
+	$("#idPos").empty();
+	if (posDesc != "") {
+		$("#idPos").append(posDesc);
+	} else {
+		$("#idPos").append("未设置(点击旁边链接更改)");
+	}
+}
+function selPosOK() {
+	uLon = changePos.uLon*1000000;
+	uLat = changePos.uLat*1000000;
+	posDesc = changePos.posDesc;
+	$("#idChangePos").css("display","none");
+	displayUserPos();
+	refreshTg(true);
+	storeUserPos();
+}
+function selPosCancel(){
+	$("#idChangePos").css("display","none");
+}
+function toTop() {
+	window.scrollTo(0,0);
+}
 
 //global code
 loadRecent();
+loadUserPos();
+
+displayUserPos();
 refreshPos();
 refreshTg(true);
+
 var elm = document.getElementsByTagName("body")[0];
 elm.addEventListener("scroll",scrollEvent, false);
-window.onscroll = scrollEvent;
-$("#idRet2Top").click(function() {
-	window.scrollTo(0,0);
-});
-$("#idClearRecent").click(clearRecent);
 
+window.onscroll = scrollEvent;
+
+$("#idRet2Top").click(toTop);
+$("#idClearRecent").click(clearRecent);
 $("#idSelModeFD").click(food);
 $("#idSelModeDY").click(film);
 $("#idSelModeNormal").click(normal);
+$("#idSelPosOK").click(selPosOK);
+$("#idSelPosCancel").click(selPosCancel);
 
 };

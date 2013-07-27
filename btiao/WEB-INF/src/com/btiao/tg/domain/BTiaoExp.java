@@ -1,4 +1,4 @@
-package com.btiao.domain;
+package com.btiao.tg.domain;
 
 public class BTiaoExp extends Exception {
 	/**

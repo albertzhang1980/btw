@@ -1,4 +1,4 @@
-package com.btiao.domain;
+package com.btiao.tg.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,16 +133,16 @@ public class UserFilter {
 		sb.append(",lon="+uLon);
 		sb.append(",lat="+uLat);
 		
-		sb.append("{");
-		for (List<Item> f : fs) {
-			sb.append("{");
-			for (Item it : f) {
-				sb.append(it.toString());
-				sb.append(",");
-			}
-			sb.append("},");
-		}
-		sb.append("}");
+//		sb.append("{");
+//		for (List<Item> f : fs) {
+//			sb.append("{");
+//			for (Item it : f) {
+//				sb.append(it.toString());
+//				sb.append(",");
+//			}
+//			sb.append("},");
+//		}
+//		sb.append("}");
 		
 		sb.append("}");
 		return sb.toString();

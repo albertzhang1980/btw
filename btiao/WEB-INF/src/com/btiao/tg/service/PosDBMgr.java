@@ -1,4 +1,4 @@
-package com.btiao.service;
+package com.btiao.tg.service;
 
 import java.io.File;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.btiao.domain.UserFilter;
-import com.btiao.domain.UserFilter.Item;
+import com.btiao.tg.domain.UserFilter;
+import com.btiao.tg.domain.UserFilter.Item;
 
 public class PosDBMgr {
 	static class PosRange {
