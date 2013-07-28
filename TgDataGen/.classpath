@@ -32,5 +32,5 @@
 	<classpathentry kind="lib" path="D:/dev/apache-tomcat/lib/tomcat-i18n-ja.jar"/>
 	<classpathentry kind="lib" path="D:/dev/apache-tomcat/lib/tomcat-jdbc.jar"/>
 	<classpathentry kind="lib" path="D:/dev/apache-tomcat/lib/tomcat-util.jar"/>
-	<classpathentry kind="output" path="WEB-INF/classes"/>
+	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
