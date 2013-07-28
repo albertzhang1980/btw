@@ -64,7 +64,7 @@ function refreshTg(wantEmpty) {
 		return;
 	}
 	
-	var url = "../GetTgs?pgs="+page_size+"&idx="+(nextPageIdx++)*page_size+"&city="+btiao.tgGlobal.curTgCity+
+	var url = "GetTgs?pgs="+page_size+"&idx="+(nextPageIdx++)*page_size+"&city="+btiao.tgGlobal.curTgCity+
 			"&uLon="+uLon+"&uLat="+uLat+genFilerArgs();
 	
 	$.getScript(url, function() {

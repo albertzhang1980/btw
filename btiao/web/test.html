@@ -13,7 +13,7 @@
 function getTg() {
 	var uLon = 116000000;
 	var uLat = 39900000;
-	var url = "../GetTgs?handle=0&pgs=10&idx=0&city="+btGlobal.curTgCity+
+	var url = "GetTgs?handle=0&pgs=10&idx=0&city="+btGlobal.curTgCity+
 			"&uLon="+uLon+"&uLat="+uLat;
 	$.getScript(url, function() {
 		var result = rst.result;
