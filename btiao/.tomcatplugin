@@ -7,5 +7,5 @@
     <updateXml>true</updateXml>
     <warLocation></warLocation>
     <extraInfo></extraInfo>
-    <webPath>/btiao</webPath>
+    <webPath>/btiao/tg</webPath>
 </tomcatProjectProperties>
