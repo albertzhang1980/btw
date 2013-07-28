@@ -33,7 +33,7 @@ function drv(p1, p2) {
 		renderOptions: { map: gMap, autoViewport: true }
 	});
 	
-	//driving.search("西单","王府井");
+	//driving.search("");
 	driving.search(new BMap.Point(p1.x, p1.y), new BMap.Point(p2.x, p2.y));
 }
 function printGeo(lon, lat, title) {
@@ -56,8 +56,8 @@ var lonDist = cos40*2*3.1415926*6371.004*1000/360; //alert(lonDist);
 var latDist = 2*3.1415926*6356.755*1000/360; //alert(latDist);
 
 function judgeNm(p, dx, dy) {
-	//var lonDist = 111194.9946; //2*3.1415926*6371.004*1000/360; //经度上每度多少米，111194.9946 m
-	//var latDist = 110946.3026; //2*3.1415926*6356.755*1000/360; //赤道上的0维度线每经度多少米，110946.3026 m	
+	//var lonDist = 111194.9946; //2*3.1415926*6371.004*1000/360; //11194.9946 m
+	//var latDist = 110946.3026; //2*3.1415926*6356.755*1000/360; //110946.3026 m	
 	var r = {x:(p.x*1000000+1000000*dx/lonDist)/1000000, y:(p.y*1000000+1000000*dy/latDist)/1000000};
 	return r;
 }
@@ -183,7 +183,6 @@ function genAll(city, p, stepDist, pp, startNumX, endNumX) {
 		return true;
 	}
 
-	//每隔100ms执行一次，一次执行10条
 	setTimeout(function() {
 		var exeNum = 0;
 		
@@ -238,10 +237,10 @@ function genAll(city, p, stepDist, pp, startNumX, endNumX) {
 		var sDist = ((eclipseNumDist)/spDist)%60; sDist = parseInt(sDist);
 		
 		$("#genAllProcess").empty();
-		$("#genAllProcess").append("<p>total: "+total+",已使用时间: "+parseInt(useTime/3600)+"小时,"+parseInt(useTime/60)%60+"分钟,"+parseInt(useTime)%60+"秒"+"</p>");
-		$("#genAllProcess").append("<p>finished_gj: "+genAll.okGJNum+","+genAll.okGJBDNum+",速度_gj: "+spGJ+",剩余时间: "+hGJ+"小时,"+mGJ+"分钟,"+sGJ+"秒"+"</p>");
-		$("#genAllProcess").append("<p>finished_zj: "+genAll.okZJNum+","+genAll.okZJBDNum+",速度_zj: "+spZJ+",剩余时间: "+hZJ+"小时,"+mZJ+"分钟,"+sZJ+"秒"+"</p>");
-		$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",速度_dist: "+spDist+",剩余时间: "+hDist+"小时,"+mDist+"分钟,"+sDist+"秒"+"</p>");
+		$("#genAllProcess").append("<p>total: "+total+",总共耗费： "+parseInt(useTime/3600)+"小时,"+parseInt(useTime/60)%60+"分钟,"+parseInt(useTime)%60+"秒"+"</p>");
+		$("#genAllProcess").append("<p>finished_gj: "+genAll.okGJNum+","+genAll.okGJBDNum+",已入库_gj: "+spGJ+",总共耗费: "+hGJ+"灏忔椂,"+mGJ+"小时,"+sGJ+"秒"+"</p>");
+		$("#genAllProcess").append("<p>finished_zj: "+genAll.okZJNum+","+genAll.okZJBDNum+",已入库_zj: "+spZJ+",总共耗费: "+hZJ+"灏忔椂,"+mZJ+"鍒嗛挓,"+sZJ+"秒"+"</p>");
+		$("#genAllProcess").append("<p>finished_dist: "+genAll.okDistOnlyNum+","+genAll.okDistOnlyBDNum+",已入库_dist: "+spDist+",总共耗费: "+hDist+"小时,"+mDist+"分钟,"+sDist+"秒"+"</p>");
 		
 		if (genAll.okDistOnlyNumLast != genAll.okDistOnlyNum) {
 			tm_start = new Date().getTime();
@@ -330,7 +329,7 @@ function flushCacheBlock(cache, start, num) {
 	}
 }
 function sendDist(d) {
-	var url = "../addp1p2dist";
+	var url = "addp1p2dist";
 	
 	$.ajax({url:url, data:d.d, dataType:"text",success:function(result) {
 		if (result == "true"){
@@ -373,9 +372,9 @@ function getDistZJ(city, p1, p2, disable) {
 			if (status == BMAP_STATUS_TIMEOUT) {
 				failCB({p1:p1,p2:p2}, true, false, false);
 			} else { 
-				var totalDist = -1;//单位：米，-1表示未知
-				var lineDist = -1;//单位：米，-1表示未知
-				var time = -1;//单位：分钟，-1表示未知
+				var totalDist = -1;//鍗曚綅锛氱背锛�1琛ㄧず鏈煡
+				var lineDist = -1;//鍗曚綅锛氱背锛�1琛ㄧず鏈煡
+				var time = -1;//鍗曚綅锛氬垎閽燂紝-1琛ㄧず鏈煡
 				var P1 = p1;
 				var P2 = p2;
 	
@@ -383,17 +382,17 @@ function getDistZJ(city, p1, p2, disable) {
 					var plan = results.getPlan(0);
 					if (0) { for (var rtIdx=0; rtIdx<plan.getNumRoutes(); ++rtIdx) {
 						var route = plan.getRoute(0);
-						var d = route.getDistance(false); //单位：米
+						var d = route.getDistance(false); //鍗曚綅锛氱背
 						totalDist += d;
 					}
-					time = 60*totalDist/(50*1000); } //按照平均每小时50公里 
+					time = 60*totalDist/(50*1000); } //鎸夌収骞冲潎姣忓皬鏃�0鍏噷 
 					
 					totalDist = plan.getDistance(false);
 					totalDist = parseInt(totalDist);
 					time = plan.getDuration(false);
 					time = parseInt(time);	
 				} else {
-					; //查询错误，表示未知
+					; //鏌ヨ閿欒锛岃〃绀烘湭鐭�
 					$("#txtoutdetail").append("<p>zjerr="+status+",p1.x="+p1.x+",p1.y="+p1.y+",p2.x="+p2.x+",p2.y="+p2.y+"</p>");
 				}
 				
@@ -432,11 +431,11 @@ function getDistGJ(city, p1, p2, disable) {
 		if (status == BMAP_STATUS_TIMEOUT){
 			failCB({p1:p1,p2:p2}, false, true, false);
 		} else {
-			var totalDistBx = -1; //单位：米，-1表示未知
-			var totalDistGj = -1; //单位：米，-1表示未知
-			var totalDist = -1; //单位：米，-1表示未知
-			var time = -1; //单位：分钟，-1表示未知
-			var lineDist = -1; //单位：米，-1表示未知
+			var totalDistBx = -1; //鍗曚綅锛氱背锛�1琛ㄧず鏈煡
+			var totalDistGj = -1; //鍗曚綅锛氱背锛�1琛ㄧず鏈煡
+			var totalDist = -1; //鍗曚綅锛氱背锛�1琛ㄧず鏈煡
+			var time = -1; //鍗曚綅锛氬垎閽燂紝-1琛ㄧず鏈煡
+			var lineDist = -1; //鍗曚綅锛氱背锛�1琛ㄧず鏈煡
 			
 			if (status == BMAP_STATUS_SUCCESS) {
 				var firstPlan = results.getPlan(0);
@@ -452,25 +451,25 @@ function getDistGJ(city, p1, p2, disable) {
 					var line = firstPlan.getLine(i);
 					gMap.addOverlay(new BMap.Polyline(line.getPath()));
 					var d = line.getDistance(false);
-					//var num = line.getNumViaStops(); //途径站点数目
+					//var num = line.getNumViaStops(); //閫斿緞绔欑偣鏁扮洰
 					totalDistGj += d;
 				}
-				time += 60*totalDistGj/(30*1000); //公交速度：30公里/小时
+				time += 60*totalDistGj/(30*1000); //鍏氦閫熷害锛�0鍏噷/灏忔椂
 				totalDist = totalDistGj + totalDistBx; }
 				
 				//$(txtoutdetail).append("totalDistGJ=" + totalDist+"("+lineDist+"), ");
 			
 				totalDist = firstPlan.getDistance(false);
-				totalDist = parseInt(totalDist); //去掉小数位
+				totalDist = parseInt(totalDist); //鍘绘帀灏忔暟浣�
 				time = firstPlan.getDuration(false)/60;
-				time = parseInt(time); //去掉小数位
+				time = parseInt(time); //鍘绘帀灏忔暟浣�
 			} else {
-				; //查询错误，表示未知
+				; //鏌ヨ閿欒锛岃〃绀烘湭鐭�
 				$("#txtoutdetail").append("<p>gjerr="+status+",p1.x="+p1.x+",p1.y="+p1.y+",p2.x="+p2.x+",p2.y="+p2.y+"</p>");
 			}
 				
 			lineDist = gMap.getDistance(new BMap.Point(p1.x/(1000*1000), p1.y/(1000*1000)),new BMap.Point(p2.x/(1000*1000), p2.y/(1000*1000)));
-			lineDist = parseInt(lineDist); //去掉小数位
+			lineDist = parseInt(lineDist); //鍘绘帀灏忔暟浣�
 			
 			var P1 = cvtP(p1);
 			var P2 = cvtP(p2);
@@ -510,7 +509,7 @@ function failCB(p2pObj, zj, gj, dist) {
 	}
 }
 function initDB(city) {
-	var url = "../dbop";
+	var url = "dbop";
 	$.ajax({url:url,
 			dataType:"text",
 			async:false,
@@ -524,7 +523,7 @@ function initDB(city) {
 			}});
 }
 function closeDB(city) {
-	var url = "../dbop";
+	var url = "dbop";
 	$.ajax({url:url,
 			dataType:"text",
 			async:false,
@@ -538,7 +537,7 @@ function closeDB(city) {
 			}});
 }
 function clearInc() {
-	var url = "../addp1p2dist";
+	var url = "addp1p2dist";
 	$.ajax({url:url,
 			dataType:"text",
 			async:false,
