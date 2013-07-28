@@ -1,6 +1,8 @@
 package com.btiao.user.domain;
 
-public class BTUser {
+import com.btiao.model.BTMO;
+
+public class BTUser extends BTMO {
 	/**
 	 * 以下划线开头的id为保留ID
 	 */
