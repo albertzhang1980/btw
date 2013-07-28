@@ -7,39 +7,13 @@
   metadata-complete="true">
     
     <servlet>
-      <servlet-name>test</servlet-name>
-      <servlet-class>com.btiao.Test</servlet-class>
-    </servlet>
-    <servlet>
       <servlet-name>GetTgs</servlet-name>
-      <servlet-class>com.btiao.servlet.GetTgs</servlet-class>
+      <servlet-class>com.btiao.tg.servlet.GetTgs</servlet-class>
     </servlet>
-    <servlet>
-      <servlet-name>P2PInfo2DB</servlet-name>
-      <servlet-class>com.btiao.servlet.gen.P2PInfo2DB</servlet-class>
-    </servlet>
-    <servlet>
-      <servlet-name>dbop</servlet-name>
-      <servlet-class>com.btiao.servlet.gen.DBOper</servlet-class>
-    </servlet>
-  
-    <servlet-mapping>
-      <servlet-name>test</servlet-name>
-      <url-pattern>/test</url-pattern>
-    </servlet-mapping>
-    
+
     <servlet-mapping>
       <servlet-name>GetTgs</servlet-name>
       <url-pattern>/GetTgs</url-pattern>
     </servlet-mapping>
     
-    <servlet-mapping>
-      <servlet-name>P2PInfo2DB</servlet-name>
-      <url-pattern>/addp1p2dist</url-pattern>
-    </servlet-mapping>
-    
-    <servlet-mapping>
-      <servlet-name>dbop</servlet-name>
-      <url-pattern>/dbop</url-pattern>
-    </servlet-mapping>
 </web-app>
