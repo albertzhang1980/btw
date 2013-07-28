@@ -15,7 +15,6 @@ import com.btiao.tg.TgData;
 import com.btiao.tg.domain.BTiaoExp;
 import com.btiao.tg.domain.UserFilter;
 import com.btiao.tg.domain.UserFilter.Item;
-import com.btiao.tg.gen.service.P2PInfoMgr;
 
 public class AllTgMgr {
 	static public class FilterRst {
