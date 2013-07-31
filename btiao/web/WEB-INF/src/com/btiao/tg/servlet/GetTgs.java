@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.btiao.exp.BTiaoExp;
 import com.btiao.tg.Result;
 import com.btiao.tg.TgData;
-import com.btiao.tg.domain.BTiaoExp;
 import com.btiao.tg.domain.UserFilter;
 import com.btiao.tg.service.AllTgMgr;
 
