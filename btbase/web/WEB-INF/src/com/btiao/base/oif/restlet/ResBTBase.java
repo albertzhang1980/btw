@@ -1,6 +1,6 @@
 package com.btiao.base.oif.restlet;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -18,7 +18,7 @@ import com.btiao.base.exp.ErrCode;
 
 public abstract class ResBTBase extends ServerResource {
 	static private enum OP {
-		Post,Put,Del,Get
+		post,put,del,get
 	};
 	
 	static public void main(String[] args) throws Exception {
@@ -32,22 +32,22 @@ public abstract class ResBTBase extends ServerResource {
 	
 	@Get(value="json")
 	public final JsonRepresentation btiaoGet() {
-		return commonPPD(null, OP.Get);
+		return commonPPD(null, OP.get);
 	}
 	
 	@Put(value="json:json")
 	public JsonRepresentation btiaoPut(JsonRepresentation arg) {
-		return commonPPD(arg, OP.Put);
+		return commonPPD(arg, OP.put);
 	}
 	
 	@Delete(value="json:json")
 	public JsonRepresentation btiaoDel(JsonRepresentation arg) {
-		return commonPPD(arg, OP.Del);
+		return commonPPD(arg, OP.del);
 	}
 	
 	@Post(value="json:json")
 	public JsonRepresentation btiaoPost(JsonRepresentation arg) {
-		return commonPPD(arg, OP.Post);
+		return commonPPD(arg, OP.post);
 	}
 	
 	/**
@@ -60,28 +60,27 @@ public abstract class ResBTBase extends ServerResource {
 	 */
 	protected abstract Object get(Form form) throws BTiaoExp;
 	
-	protected abstract Object put(JSONObject jao) throws BTiaoExp;
+	protected abstract Object put(Object arg) throws BTiaoExp;
 	
-	protected abstract Object post(JSONObject jao) throws BTiaoExp;
+	protected abstract Object post(Object arg) throws BTiaoExp;
 	
-	protected abstract Object del(JSONObject jao) throws BTiaoExp;
+	protected abstract Object del(Object arg) throws BTiaoExp;
+	
+	private Object cvtJson2Obj(OP op, JSONObject jo) throws Exception {
+		Method m = this.getClass().getMethod("del");
+		JsonCvtInfo annot = m.getAnnotation(JsonCvtInfo.class);
+		String objClassName = annot.objClassName();
+		Object obj = Class.forName(objClassName).newInstance();
+		new JSONConvert().json2obj(jo, obj);
+		return obj;
+	}
 	
 	private JSONObject setContentOfJRO(JSONObject jro, Object contentRet) {
 		if (contentRet == null) {
 			return jro;
 		}
 		
-		Field[] fields = contentRet.getClass().getFields();
-		for (Field f : fields) {
-			String name = f.getName();
-			try {
-				Object value = f.get(contentRet);
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-			
-		}
+		new JSONConvert().obj2json(contentRet, jro);
 		return jro;
 	}
 	
@@ -93,17 +92,19 @@ public abstract class ResBTBase extends ServerResource {
 			Object contentRet = null;
 			
 			try {
-				if (op == OP.Get) {
+				if (op == OP.get) {
 					Form form = this.getReference().getQueryAsForm();
 					contentRet = get(form);
 				} else {
 					JSONObject jao = arg.getJsonObject();
-					if (op == OP.Del) {
-						contentRet = del(jao);
-					} else if (op == OP.Post) {
-						contentRet = post(jao);
-					} else if (op == OP.Put) {
-						contentRet = put(jao);
+					
+					Object argObj = cvtJson2Obj(op, jao);
+					if (op == OP.del) {						
+						contentRet = del(argObj);
+					} else if (op == OP.post) {
+						contentRet = post(argObj);
+					} else if (op == OP.put) {
+						contentRet = put(argObj);
 					}
 				}
 			} catch (BTiaoExp e) {
@@ -131,7 +132,4 @@ public abstract class ResBTBase extends ServerResource {
 		
 		return jro;
 	}
-	
-	
-
 }

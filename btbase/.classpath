@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="web/WEB-INF/lib/org.restlet.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/log4j-1.2-api-2.0-beta8.jar"/>
 	<classpathentry kind="lib" path="web/WEB-INF/lib/log4j-api-2.0-beta8.jar"/>
+	<classpathentry kind="lib" path="web/WEB-INF/lib/log4j-core-2.0-beta8.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
