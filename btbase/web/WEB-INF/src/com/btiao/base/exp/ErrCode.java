@@ -1,4 +1,4 @@
-package com.btiao.exp;
+package com.btiao.base.exp;
 
 public class ErrCode {
 	static public int SUCCESS = 0;

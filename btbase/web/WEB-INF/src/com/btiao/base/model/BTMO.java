@@ -1,4 +1,4 @@
-package com.btiao.model;
+package com.btiao.base.model;
 
 public class BTMO {
 	/**

@@ -1,4 +1,4 @@
-package com.btiao.oif.restlet;
+package com.btiao.base.oif.restlet;
 
 import java.lang.reflect.Field;
 
@@ -13,8 +13,8 @@ import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
-import com.btiao.exp.BTiaoExp;
-import com.btiao.exp.ErrCode;
+import com.btiao.base.exp.BTiaoExp;
+import com.btiao.base.exp.ErrCode;
 
 public abstract class ResBTBase extends ServerResource {
 	static private enum OP {
