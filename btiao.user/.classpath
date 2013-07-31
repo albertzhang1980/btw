@@ -9,5 +9,12 @@
 	<classpathentry kind="src" path="web/WEB-INF/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/btiao.base"/>
 	<classpathentry kind="lib" path="/btiao.base/web/WEB-INF/classes"/>
+	<classpathentry kind="lib" path="/btiao.base/web/WEB-INF/lib/org.json.jar"/>
+	<classpathentry kind="lib" path="/btiao.base/web/WEB-INF/lib/org.restlet.ext.json.jar"/>
+	<classpathentry kind="lib" path="/btiao.base/web/WEB-INF/lib/org.restlet.ext.servlet.jar"/>
+	<classpathentry kind="lib" path="/btiao.base/web/WEB-INF/lib/org.restlet.ext.xstream.jar"/>
+	<classpathentry kind="lib" path="/btiao.base/web/WEB-INF/lib/org.restlet.jar"/>
+	<classpathentry kind="lib" path="/btiao.base/web/WEB-INF/lib/log4j-1.2-api-2.0-beta8.jar"/>
+	<classpathentry kind="lib" path="/btiao.base/web/WEB-INF/lib/log4j-api-2.0-beta8.jar"/>
 	<classpathentry kind="output" path="web/WEB-INF/classes"/>
 </classpath>
