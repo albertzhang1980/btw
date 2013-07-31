@@ -1,21 +1,21 @@
 package com.btiao.user.domain;
 
-import com.btiao.model.BTMO;
+import com.btiao.base.model.BTMO;
 
 public class BTUserLoginState extends BTMO {
 	/**
-	 * ËùÓÐÓÃ»§µÄµÇÂ¼×´Ì¬¶¼ÓÐÕâ¸ö×Ö¶ÎÇø·Ö
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Äµï¿½Â¼×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½
 	 */
 	public String accessKey;
 	
 	/**
-	 * µÇÂ¼Ê±¼ä£¬Ïà¶ÔÓÚ1970Äê1ÔÂ1ÈÕ0Ê±0·Ö0Ãë
+	 * ï¿½ï¿½Â¼Ê±ï¿½ä£¬ï¿½ï¿½ï¿½ï¿½ï¿½1970ï¿½ï¿½1ï¿½ï¿½1ï¿½ï¿½0Ê±0ï¿½ï¿½0ï¿½ï¿½
 	 */
 	public long loginTime;
 	
 	/**
-	 * ÉÏ´Î²Ù×÷Ê±¼ä
-	 * Á¬ÐøNÃëÄÚÃ»ÓÐ²Ù×÷ÔòÏµÍ³×Ô¶¯ÍË³ö£¬NÓÉUserMgr¶¨Òå
+	 * ï¿½Ï´Î²ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+	 * ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ð²ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½Ô¶ï¿½ï¿½Ë³ï¿½ï¿½ï¿½Nï¿½ï¿½UserMgrï¿½ï¿½ï¿½ï¿½
 	 */
 	public long lastOpTime;
 }

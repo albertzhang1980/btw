@@ -1,20 +1,20 @@
 package com.btiao.user.domain;
 
-import com.btiao.model.BTMO;
+import com.btiao.base.model.BTMO;
 
 public class BTUser extends BTMO {
 	/**
-	 * 以下划线开头的id为保留ID
+	 * 锟斤拷锟铰伙拷锟竭匡拷头锟斤拷id为锟斤拷锟斤拷ID
 	 */
 	public String id;
 	
 	/**
-	 * 用户昵称
+	 * 锟矫伙拷锟角筹拷
 	 */
 	public String desc;
 	
 	/**
-	 * 用户密码
+	 * 锟矫伙拷锟斤拷锟斤拷
 	 */
 	public String passwd;
 }
