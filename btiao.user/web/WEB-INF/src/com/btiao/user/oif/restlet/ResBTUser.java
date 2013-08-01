@@ -17,12 +17,14 @@ public class ResBTUser extends ResBTBase {
 	}
 
 	@Override
+	@JsonCvtInfo(objClassName="com.btiao.user.domain.BTUser")
 	protected Object put(Object obj) throws BTiaoExp {
-		// TODO Auto-generated method stub
+		BTUser u = (BTUser)obj;
 		return null;
 	}
 
 	@Override
+	@JsonCvtInfo(objClassName="com.btiao.user.domain.BTUser")
 	protected Object post(Object obj) throws BTiaoExp {
 		// TODO Auto-generated method stub
 		return null;

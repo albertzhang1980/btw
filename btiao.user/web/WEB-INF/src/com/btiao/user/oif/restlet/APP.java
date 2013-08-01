@@ -9,7 +9,7 @@ import com.btiao.base.oif.restlet.ResBTBase;
 public class APP extends Application {
 	public Restlet createInboundRoot() {
 		Router router = new Router(getContext());
-		router.attach("/users/{userId}", ResBTBase.class);
+		router.attach("/{userId}", ResBTBase.class);
 		return router;
 	}
 }
