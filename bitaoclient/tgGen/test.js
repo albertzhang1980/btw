@@ -1,4 +1,6 @@
 var gMap;
+var tgRoot = "/btiao/tgGen"
+
 function onLoad() {
 	$("#p1x").blur(function() {
 		p1.x = $("#p1x").val();
@@ -329,7 +331,7 @@ function flushCacheBlock(cache, start, num) {
 	}
 }
 function sendDist(d) {
-	var url = "addp1p2dist";
+	var url = tgRoot + "/addp1p2dist";
 	
 	$.ajax({url:url, data:d.d, dataType:"text",success:function(result) {
 		if (result == "true"){
@@ -509,7 +511,7 @@ function failCB(p2pObj, zj, gj, dist) {
 	}
 }
 function initDB(city) {
-	var url = "dbop";
+	var url = tgRoot + "/dbop";
 	$.ajax({url:url,
 			dataType:"text",
 			async:false,
@@ -523,7 +525,7 @@ function initDB(city) {
 			}});
 }
 function closeDB(city) {
-	var url = "dbop";
+	var url = tgRoot + "/dbop";
 	$.ajax({url:url,
 			dataType:"text",
 			async:false,
@@ -537,7 +539,7 @@ function closeDB(city) {
 			}});
 }
 function clearInc() {
-	var url = "addp1p2dist";
+	var url = tgRoot + "/addp1p2dist";
 	$.ajax({url:url,
 			dataType:"text",
 			async:false,
