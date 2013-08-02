@@ -3,7 +3,6 @@ package com.btiao.base.oif.restlet;
 import java.lang.reflect.Field;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import sun.rmi.runtime.Log;
 import com.btiao.base.exp.BTiaoExp;
 import com.btiao.base.exp.ErrCode;
 import com.btiao.base.utils.BTiaoLog;
