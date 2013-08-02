@@ -16,6 +16,8 @@ var RECENT_LIMIT = 10;
 
 var lastSelModeId = "idSelModeNormal";
 
+var tgSvrRoot = "/btiao/tg";
+
 //function define
 function clearRecent() {
 	recentTg = [];
@@ -64,7 +66,7 @@ function refreshTg(wantEmpty) {
 		return;
 	}
 	
-	var url = "GetTgs?pgs="+page_size+"&idx="+(nextPageIdx++)*page_size+"&city="+btiao.tgGlobal.curTgCity+
+	var url = tgSvrRoot + "/GetTgs?pgs="+page_size+"&idx="+(nextPageIdx++)*page_size+"&city="+btiao.tgGlobal.curTgCity+
 			"&uLon="+uLon+"&uLat="+uLat+genFilerArgs();
 	
 	$.getScript(url, function() {
