@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="web/WEB-INF/src"/>
+	<classpathentry kind="src" path="WEB-INF/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/third"/>
 	<classpathentry exported="true" kind="var" path="TOMCAT_HOME/lib/servlet-api.jar"/>
@@ -10,5 +10,5 @@
 	<classpathentry exported="true" kind="var" path="TOMCAT_HOME/lib/annotations-api.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/btiao.tg.gen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/btiao.base"/>
-	<classpathentry kind="output" path="web/WEB-INF/classes"/>
+	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>
